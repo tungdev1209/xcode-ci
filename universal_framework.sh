@@ -16,8 +16,11 @@ simulator_dir=${product_des}/Simulator
 production_dir=${product_des}/Production
 development_dir=${product_des}/Development
 project_binary="${project_name}.framework/${project_name}"
+project_dSYM_binary="${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}"
 
-project_dSYM="${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}"
+rm -rf ${simulator_dir}
+rm -rf ${production_dir}
+rm -rf ${development_dir}
 
 mkdir ${product_des}
 mkdir ${development_dir}
@@ -40,7 +43,7 @@ ${xcodebuild_cmd} -sdk iphoneos CONFIGURATION_BUILD_DIR=${production_dir}
 echo "=== combine dSYM files ==="
 cp -R ${production_dir}/${project_name}.framework.dSYM ${development_dir}
 rm -rf ${development_dir}/${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}
-lipo "${simulator_dir}/${project_dSYM}" "${production_dir}/${project_dSYM}" -create -output "${development_dir}/${project_dSYM}"
+lipo "${simulator_dir}/${project_dSYM_binary}" "${production_dir}/${project_dSYM_binary}" -create -output "${development_dir}/${project_dSYM_binary}"
 
 UUIDs=$(dwarfdump --uuid "${production_dir}/${project_name}.framework.dSYM" | cut -d ' ' -f2)
 echo ${UUIDs}
