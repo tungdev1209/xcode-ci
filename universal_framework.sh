@@ -3,13 +3,16 @@
 project_dir="$1"
 product_des_input="$2"
 
-file_dir=$(find ${project_dir} -iname '*.xcodeproj')
-file_full_name=$(echo ${file_dir##*/})
-project_name=$(echo $file_full_name| cut -d'.' -f 1)
-
+if [ "$1" == "" ]; then
+    echo "ERROR: Must have project directory"
+    exit 1
+fi
 if [ "$2" == "" ]; then
     product_des_input=${project_dir}
 fi
+
+file_dir=$(find ${project_dir} -iname '*.xcodeproj')
+project_name=$(basename ${file_dir} ".xcodeproj")
 
 product_des=${product_des_input}/${project_name}
 simulator_dir=${product_des}/Simulator
