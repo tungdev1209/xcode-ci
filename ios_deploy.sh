@@ -12,8 +12,8 @@ get_value token
 token=${value}
 
 # path to .xcodeproj
-get_value file_proj_path
-file_proj_path=${value}
+get_value file_project_path
+file_project_path=${value}
 
 get_value archive_scheme
 archive_scheme=${value}
@@ -28,9 +28,13 @@ archive_config_path=${value}
 get_value export_path
 export_path=${value}
 
-project_full_name=$(find ${file_proj_path} -iname '*.xcodeproj')
+# get_value callback_emails
+emails=$(jq '.callback_emails[]' ${deploy_config_path} | tr -d \" | tr '\n' ',')
+callback_emails=${emails::${#emails}-1}
+
+project_full_name=$(find ${file_project_path} -iname '*.xcodeproj')
 project_name=$(basename ${project_full_name} ".xcodeproj")
-project_path="${file_proj_path}/${project_name}.xcodeproj"
+project_path="${file_project_path}/${project_name}.xcodeproj"
 file_exported_name="${archive_scheme}.ipa"
 
 echo "Archiving... ${archive_scheme}.xcarchive"
@@ -41,7 +45,7 @@ xcodebuild -exportArchive -archivePath ${archive_path} -exportOptionsPlist ${arc
 
 echo "Upload to diawi"
 upload_cmd="curl https://upload.diawi.com/ -F token=${token} -F file=@${export_path}/${file_exported_name} "
-${upload_cmd} -F callback_emails='tungnq4@fsoft.com.vn,tungnguyen.dev@gmail.com' > ${export_path}/response.json
+${upload_cmd} -F callback_emails=${emails} > ${export_path}/response.json
 job_id=$(jq '.job' ${export_path}/response.json | tr -d \")
 rm -rf ${export_path}/response.json
 echo ${job_id}
