@@ -11,6 +11,9 @@ if [ "$2" == "" ]; then
     product_des_input=${project_dir}
 fi
 
+project_dir="$(pwd)/${project_dir}"
+product_des_input="$(pwd)/${product_des_input}"
+
 file_dir=$(find ${project_dir} -iname '*.xcodeproj')
 project_name=$(basename ${file_dir} ".xcodeproj")
 

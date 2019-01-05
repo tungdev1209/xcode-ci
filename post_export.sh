@@ -2,6 +2,8 @@
 
 deploy_config_path=$1
 
+cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
+
 value=""
 get_value()
 {
@@ -32,8 +34,7 @@ job_id=$(jq '.job' ${export_path}/response.json | tr -d \")
 rm -rf ${export_path}/response.json
 echo ${job_id}
 
-if [ "${job_id}" == "null" ] || [ "${job_id}" == "" ]
-then
+if [ "${job_id}" == "null" ] || [ "${job_id}" == "" ]; then
     echo 'ERROR: Cannot get job identifier'
     exit 1
 fi
@@ -43,6 +44,9 @@ product_link=$(curl -vvv "${status_url}" | jq '.link' | tr -d \")
 
 echo ${product_link}
 
-qrgen.sh ${product_link} ${project_name}
+python ${cmd_path}/qrgen.py -t ${product_link} -n ${project_name}
 
-open ${project_name}.png
+if [ -e "${project_name}.png" ]; then
+    mv ${project_name}.png $2
+    open $2/${project_name}.png
+fi

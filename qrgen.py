@@ -5,10 +5,8 @@ import qrcode
 import argparse
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t", "--text", required=True,
-	help="text for generate")
-ap.add_argument("-n", "--name", required=False,
-	help="name of qr image")
+ap.add_argument("-t", "--text", required=True, help="text for generate")
+ap.add_argument("-n", "--name", required=False, help="name of qr image")
 args = vars(ap.parse_args())
 
 text = args['text']
