@@ -1,1 +1,0 @@
-python /Users/tungnguyen/Desktop/Projects/Products/UniversalFramework/qrgen.py -t ${1} -n ${2}
