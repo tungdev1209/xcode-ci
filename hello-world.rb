@@ -1,11 +1,11 @@
 class HelloWorld < Formula
     desc "usefull script that prints Hello World to your Console"
-    homepage "https://bitbucket.org/user/repo"
+    homepage "https://github.com/tungdev1209/iOS-Universal-Framework"
   
   
-    url "https://bitbucket.org/user/repo/get/HEAD.zip", :using => :curl
+    url "https://github.com/tungdev1209/iOS-Universal-Framework/blob/master/HEAD.zip", :using => :curl
   
     def install
-      bin.install "innovid/hello-world"
+        bin.install "test"
     end
   end
