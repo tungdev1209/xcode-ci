@@ -1,6 +1,36 @@
 # created by TungNQ
 
-deploy_config_path=$1
+param=$1
+
+if [ "$1" == "init" ]; then
+    # get resource
+    resource_path="/Users/tungnguyen/Desktop/Projects/Products/UniversalFramework"
+
+    # Creating
+    # ... hidden .deploy dir
+    deploy_path="./.deploy"
+    mkdir ${deploy_path}
+
+    # ... deploy_config & export_config files
+    cp -R ${resource_path}/archive_config.plist ${deploy_path}/archive_config.plist
+    cp -R ${resource_path}/deploy_config.json ${deploy_path}/deploy_config.json
+
+    # ... hooks dir and files inside
+    mkdir ${deploy_path}/hooks
+    cp -R ${resource_path}/hooks/ ${deploy_path}/hooks/
+
+    echo "Initialize deployment configuration for this project - done"
+
+    exit 1
+fi
+
+deploy_config_path="$(pwd)/.deploy/deploy_config.json"
+
+if [ ! -e "${deploy_config_path}" ]; then
+    echo "Need initialize first: ios_deploy init"
+    exit 1
+fi
+
 cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
 
 value=""
