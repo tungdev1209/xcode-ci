@@ -1,12 +1,37 @@
 # created by TungNQ
 
+resource_path="/usr/local/ios_deploy"
+if [ "$1" == "__setup" ]; then
+    # setup this script
+    chmod +x ./ios_deploy.sh
+    cp ./ios_deploy.sh /usr/local/bin
+
+    # copy resource for use
+    if [ ! -d "${resource_path}" ]; then
+        mkdir ${resource_path}
+    fi
+    cp ./deploy_config.json ${resource_path}
+    cp ./export_config.plist ${resource_path}
+    cp -R ./hooks/ /usr/local/ios_deploy/hooks
+    exit 1
+fi
+
+if [ "$1" == "__uninstall" ]; then
+    rm -rf ${resource_path}
+    rm -rf /usr/local/bin/ios_deploy.sh
+    exit 1
+fi
+
 if [ "$1" == "init" ]; then
     # get resource
-    resource_path="/Users/tungnguyen/Desktop/Projects/Products/UniversalFramework"
+    if [ ! -d "${resource_path}" ]; then
+        echo "=> Resource not found, please 'sudo sh ios_deploy __setup' to setup this framework"
+        exit 1
+    fi
 
     deploy_path="./.deploy"
     if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
-        echo "=> This project is initialized, use 'ios_deploy init -f' to re-init"
+        echo "=> This project is initialized, please 'ios_deploy init -f' to re-init"
         exit 1
     fi
 
@@ -21,8 +46,7 @@ if [ "$1" == "init" ]; then
     # ... hooks dir and files inside
     mkdir ${deploy_path}/hooks
     cp -R ${resource_path}/hooks/ ${deploy_path}/hooks/
-
-    echo "=> Initialized"
+    
     exit 1
 fi
 
