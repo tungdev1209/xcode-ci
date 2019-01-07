@@ -24,5 +24,6 @@ qr = qrcode.QRCode(
 qr.add_data(text)
 qr.make(fit=True)
 
-img = qr.make_image(fill_color="black", back_color="white")
-img.save(name + '.png')
+def run():
+    img = qr.make_image(fill_color="black", back_color="white")
+    img.save(name + '.png')

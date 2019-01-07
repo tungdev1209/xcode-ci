@@ -29,7 +29,7 @@ fi
 # check this project is initialized?
 deploy_config_path="$(pwd)/.deploy/deploy_config.json"
 
-if [ ! -f "${deploy_config_path}" ]; then
+if [ ! -e "${deploy_config_path}" ]; then
     echo "=> deploy_config.json not found at $(pwd)/.deploy"
     echo "=> Need initialize first: ios_deploy init [-f]"
     exit 1
@@ -72,7 +72,7 @@ archive_path=${value}
 archive_file_path="${archive_path}/${archive_scheme}.xcarchive"
 
 # create dir if needed
-if [ ! -d "$archive_path" ]; then
+if [ ! -d "${archive_path}" ]; then
     mkdir ${archive_path}
 fi
 
@@ -89,7 +89,7 @@ sh ${cmd_path}/pre_archive.sh ${deploy_config_path} ${archive_path}
 echo "=> Archiving... ${archive_scheme}.xcarchive"
 xcodebuild -project ${project_path} -scheme ${archive_scheme} -configuration Release archive -archivePath ${archive_file_path}
 
-if [ ! -f "${archive_file_path}" ]; then
+if [ ! -e "${archive_file_path}" ]; then
     rm -rf ${archive_path}
     exit 1
 fi
@@ -104,7 +104,7 @@ fi
 # ========== EXPORT ==========
 # path to export_config.plist
 export_config_path="$(pwd)/.deploy/export_config.plist"
-if [ ! -f "${export_config_path}" ]; then
+if [ ! -e "${export_config_path}" ]; then
     echo "=> export_config.plist not found at $(pwd)/.deploy"
     echo "=> Need initialize first: ios_deploy init [-f]"
     exit 1
@@ -125,7 +125,7 @@ sh ${cmd_path}/pre_export.sh ${deploy_config_path} ${export_path}
 echo "=> Exporting... ${file_exported_name}"
 xcodebuild -exportArchive -archivePath ${archive_file_path} -exportOptionsPlist ${export_config_path} -exportPath ${export_path}
 
-if [ ! -f "${export_path}/${file_exported_name}" ]; then
+if [ ! -e "${export_path}/${file_exported_name}" ]; then
     exit 1
 fi
 

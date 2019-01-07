@@ -1,0 +1,3 @@
+[console_scripts]
+py_jsonvalue = py_jsonvalue:run
+

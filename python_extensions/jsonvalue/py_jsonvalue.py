@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# created by TungNQ
+
 import json
 import argparse
 
@@ -26,7 +29,8 @@ for key in keys:
 # close the json file
 f.close()
 
-if isinstance(current_data, list):
-    print ', '.join(current_data)
-else:
-    print current_data
+def run():
+    if isinstance(current_data, list):
+        print ', '.join(current_data)
+    else:
+        print current_data

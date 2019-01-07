@@ -3,8 +3,8 @@
 # $2: path to exported file
 # $3: export file name
 
-echo ">>>>> Post-Export steps begin"
+echo "=> Post-Export steps begin"
 
 # do something ...
 
-echo ">>>>> Post-Export steps done"
+echo "=> Post-Export steps done"

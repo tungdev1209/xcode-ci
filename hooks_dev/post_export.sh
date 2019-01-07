@@ -3,7 +3,7 @@
 # $2: path to exported file
 # $3: export file name
 
-echo ">>>>> Post-Export steps begin"
+echo "=> Post-Export steps begin"
 
 # upload to diawi
 deploy_config_path=$1
@@ -12,8 +12,6 @@ deploy_config_path=$1
 if [ ! -f "${deploy_config_path}" ]; then
     exit 1
 fi
-
-cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
 
 value=""
 get_value()
@@ -38,7 +36,7 @@ project_name=$(basename ${project_full_name} ".xcodeproj")
 emails=$(jq '.callback_emails[]' ${deploy_config_path} | tr -d \" | tr '\n' ',')
 callback_emails=${emails::${#emails}-1}
 
-echo "Upload to diawi"
+echo "=> Upload..."
 upload_cmd="curl https://upload.diawi.com/ -F token=${token} -F file=@${export_path}/${file_exported_name} "
 ${upload_cmd} -F callback_emails=${callback_emails} > ${export_path}/response.json
 job_id=$(jq '.job' ${export_path}/response.json | tr -d \")
@@ -55,9 +53,9 @@ product_link=$(curl -vvv "${status_url}" | jq '.link' | tr -d \")
 
 echo ${product_link}
 
-python ${cmd_path}/qrgen.py -t ${product_link} -n ${project_name}
+py_qrgen -t ${product_link} -n ${project_name}
 
-if [ -f "${project_name}.png" ]; then
+if [ -e "${project_name}.png" ]; then
     mv ${project_name}.png $2
     open $2/${project_name}.png
 fi
