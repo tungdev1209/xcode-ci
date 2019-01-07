@@ -1,7 +1,17 @@
+# params:
+# $1: path to deploy_config.json
+# $2: path to exported file
+# $3: export file name
+
 echo ">>>>> Post-Export steps begin"
 
 # upload to diawi
 deploy_config_path=$1
+
+# only execute if deploy config file existing
+if [ ! -f "${deploy_config_path}" ]; then
+    exit 1
+fi
 
 cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
 
@@ -47,7 +57,7 @@ echo ${product_link}
 
 python ${cmd_path}/qrgen.py -t ${product_link} -n ${project_name}
 
-if [ -e "${project_name}.png" ]; then
+if [ -f "${project_name}.png" ]; then
     mv ${project_name}.png $2
     open $2/${project_name}.png
 fi
