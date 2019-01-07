@@ -1,0 +1,6 @@
+{
+    "project_path":".",
+    "archive_scheme":"NGPlayerDemoProduction",
+    "archive_path":"./Archive",
+    "archive_config_path":"./archive_config.plist"
+}

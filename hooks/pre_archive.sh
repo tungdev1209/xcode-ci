@@ -1,5 +1,6 @@
-# build frameworks
+echo ">>>>> Pre-Archive steps begin"
 
+# build frameworks
 deploy_config_path=$1
 
 cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
@@ -10,7 +11,7 @@ get_value()
     value=$(jq ".$1" ${deploy_config_path} | tr -d \")
 }
 
-# path to .xcodeproj
+# get .xcodeproj path
 get_value project_path
 project_path=${value}
 
@@ -23,6 +24,7 @@ generate_id=$(uuidgen)
 frameworks_dir="${project_path}/Frameworks_${generate_id}"
 mkdir ${frameworks_dir}
 
+# Build frameworks asynchronously
 echo ">>>>> Build all frameworks"
 fw_build_cmd_path="${cmd_path}/ios_universal_framework.sh"
 
@@ -31,7 +33,6 @@ do
     echo "building framework at $path - $frameworks_dir"
     sh ${fw_build_cmd_path} ${path} ${frameworks_dir} &
 done
-
 wait
 
 echo ">>>> Build frameworks done"

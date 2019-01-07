@@ -1,5 +1,6 @@
-# upload to diawi
+echo ">>>>> Post-Export steps begin"
 
+# upload to diawi
 deploy_config_path=$1
 
 cmd_path="/Users/apple/Desktop/Projects/StartUp/DevOps/iOS-Universal-Framework"
@@ -50,3 +51,5 @@ if [ -e "${project_name}.png" ]; then
     mv ${project_name}.png $2
     open $2/${project_name}.png
 fi
+
+echo ">>>>> Post-Export steps done"
