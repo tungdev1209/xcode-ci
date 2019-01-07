@@ -7,7 +7,7 @@ if [ "$1" == "init" ]; then
     resource_path="/Users/tungnguyen/Desktop/Projects/Products/UniversalFramework"
 
     if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
-        echo "This project is initialized, use 'ios_deploy init -f' to re-init"
+        echo "=> This project is initialized, use 'ios_deploy init -f' to re-init"
         exit 1
     fi
 
@@ -23,7 +23,7 @@ if [ "$1" == "init" ]; then
     mkdir ${deploy_path}/hooks
     cp -R ${resource_path}/hooks/ ${deploy_path}/hooks/
 
-    echo "Initialized"
+    echo "=> Initialized"
     exit 1
 fi
 
@@ -31,7 +31,8 @@ fi
 deploy_config_path="$(pwd)/.deploy/deploy_config.json"
 
 if [ ! -f "${deploy_config_path}" ]; then
-    echo "Need initialize first: ios_deploy init"
+    echo "=> deploy_config.json not found at $(pwd)/.deploy"
+    echo "=> Need initialize first: ios_deploy init [-f]"
     exit 1
 fi
 
@@ -45,7 +46,7 @@ elif [ "$1" == "exp" ]; then
     is_export=1
     echo "EXPORT"
 else
-    echo "Argument not found, ex: ios_deploy arc, ..."
+    echo "=> Argument not found, ex: ios_deploy arc, ..."
     exit 1
 fi
 
@@ -86,7 +87,7 @@ project_path="${project_path}/${project_name}.xcodeproj"
 sh ${cmd_path}/pre_archive.sh ${deploy_config_path} ${archive_path}
 
 # Run Archive job
-echo ">>>>> Archiving... ${archive_scheme}.xcarchive"
+echo "=> Archiving... ${archive_scheme}.xcarchive"
 xcodebuild -project ${project_path} -scheme ${archive_scheme} -configuration Release archive -archivePath ${archive_file_path}
 
 if [ ! -f "${archive_file_path}" ]; then
@@ -118,7 +119,7 @@ export_config_path=${value}
 sh ${cmd_path}/pre_export.sh ${deploy_config_path} ${export_path}
 
 # Run Export job
-echo ">>>>> Exporting... ${file_exported_name}"
+echo "=> Exporting... ${file_exported_name}"
 xcodebuild -exportArchive -archivePath ${archive_file_path} -exportOptionsPlist ${export_config_path} -exportPath ${export_path}
 
 if [ ! -f "${export_path}/${file_exported_name}" ]; then
