@@ -1,6 +1,5 @@
 {
     "project_path":".",
     "archive_path":"./Archive",
-    "export_config_path":"./export_config.plist",
     "archive_scheme":"ArchiveSchemeName"
 }

@@ -1,11 +1,10 @@
 # created by TungNQ
 
 if [ "$1" == "init" ]; then
-    deploy_path="./.deploy"
-
     # get resource
     resource_path="/Users/tungnguyen/Desktop/Projects/Products/UniversalFramework"
 
+    deploy_path="./.deploy"
     if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
         echo "=> This project is initialized, use 'ios_deploy init -f' to re-init"
         exit 1
@@ -103,7 +102,14 @@ if [ $is_archive == 1 ]; then
 fi
 
 # ========== EXPORT ==========
-# Run Pre Export job
+# path to export_config.plist
+export_config_path="$(pwd)/.deploy/export_config.plist"
+if [ ! -f "${export_config_path}" ]; then
+    echo "=> export_config.plist not found at $(pwd)/.deploy"
+    echo "=> Need initialize first: ios_deploy init [-f]"
+    exit 1
+fi
+
 # prepare vars for exporting steps
 file_exported_name="${archive_scheme}.ipa"
 
@@ -112,10 +118,7 @@ export_id=$(uuidgen)
 export_path="${archive_path}/Export_${export_id}"
 mkdir ${export_path}
 
-# path to exportOptions.plist
-get_value export_config_path 
-export_config_path=${value}
-
+# Run Pre Export job
 sh ${cmd_path}/pre_export.sh ${deploy_config_path} ${export_path}
 
 # Run Export job

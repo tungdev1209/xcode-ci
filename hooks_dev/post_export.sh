@@ -62,4 +62,4 @@ if [ -f "${project_name}.png" ]; then
     open $2/${project_name}.png
 fi
 
-echo ">>>>> Post-Export steps done"
+echo "=> Post-Export steps done"
