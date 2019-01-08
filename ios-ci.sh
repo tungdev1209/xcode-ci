@@ -1,20 +1,20 @@
 # created by TungNQ
 
-version="1.0.2"
+version="1.0.6"
 
 # the resource path
-resource_path="$(brew --cellar ios_deploy)/$version"
+resource_path="$(brew --cellar ios-ci)/$version"
 
-if [ "$1" == "__test_cmd" ]; then
-    echo "tungnq - hello"
+if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
+    echo $version
     exit 1
 fi
 
 # ========== SETUP ==========
 # if [ "$1" == "__setup" ]; then
 #     # setup this script
-#     chmod +x ./ios_deploy
-#     cp ./ios_deploy /usr/local/bin
+#     chmod +x ./ios-ci
+#     cp ./ios-ci /usr/local/bin
 
 #     # copy resource for use
 #     if [ ! -d "${resource_path}" ]; then
@@ -22,14 +22,14 @@ fi
 #     fi
 #     cp ./deploy_config.json ${resource_path}
 #     cp ./export_config.plist ${resource_path}
-#     cp -R ./hooks/ /usr/local/ios_deploy/hooks
+#     cp -R ./hooks/ /usr/local/ios-ci/hooks
 #     exit 1
 # fi
 
 # ========== UNINSTALL ==========
 # if [ "$1" == "__uninstall" ]; then
 #     rm -rf ${resource_path}
-#     rm -rf /usr/local/bin/ios_deploy
+#     rm -rf /usr/local/bin/ios-ci
 #     exit 1
 # fi
 
@@ -37,13 +37,13 @@ fi
 if [ "$1" == "init" ]; then
     # get resource
     if [ ! -d "${resource_path}" ]; then
-        echo "=> Resource not found, please 'brew upgrade ios_deploy'"
+        echo "=> Resource not found, please 'brew upgrade ios-ci'"
         exit 1
     fi
 
     deploy_path="./.deploy"
     if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
-        echo "=> This project is initialized, please 'ios_deploy init -f' to re-init"
+        echo "=> This project is initialized, please 'ios-ci init -f' to re-init"
         exit 1
     fi
 
@@ -67,7 +67,7 @@ deploy_config_path="$(pwd)/.deploy/deploy_config.json"
 
 if [ ! -e "${deploy_config_path}" ]; then
     echo "=> deploy_config.json not found at $(pwd)/.deploy"
-    echo "=> Need initialize first: ios_deploy init [-f]"
+    echo "=> Need initialize first: ios-ci init [-f]"
     exit 1
 fi
 
@@ -81,7 +81,7 @@ elif [ "$1" == "-e" ]; then
     is_export=1
     echo "EXPORT"
 else
-    echo "=> Argument not found, ex: ios_deploy -a, ..."
+    echo "=> Argument not found, ex: ios-ci -a, ..."
     exit 1
 fi
 
@@ -142,7 +142,7 @@ fi
 export_config_path="$(pwd)/.deploy/export_config.plist"
 if [ ! -e "${export_config_path}" ]; then
     echo "=> export_config.plist not found at $(pwd)/.deploy"
-    echo "=> Need initialize first: ios_deploy init [-f]"
+    echo "=> Need initialize first: ios-ci init [-f]"
     exit 1
 fi
 
