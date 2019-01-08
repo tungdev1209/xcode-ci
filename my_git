@@ -1,0 +1,7 @@
+# sh
+if [ "$1" == "push" ] && [ "$2" != "" ]; then
+    git add .
+    git commit -m "$2"
+    git push
+    git status
+fi
