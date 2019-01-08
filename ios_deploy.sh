@@ -1,31 +1,43 @@
 # created by TungNQ
 
-resource_path="/usr/local/ios_deploy"
-if [ "$1" == "__setup" ]; then
-    # setup this script
-    chmod +x ./ios_deploy.sh
-    cp ./ios_deploy.sh /usr/local/bin
+version="1.0.2"
 
-    # copy resource for use
-    if [ ! -d "${resource_path}" ]; then
-        mkdir ${resource_path}
-    fi
-    cp ./deploy_config.json ${resource_path}
-    cp ./export_config.plist ${resource_path}
-    cp -R ./hooks/ /usr/local/ios_deploy/hooks
+# the resource path
+resource_path="$(brew --cellar ios_deploy)/$version"
+
+if [ "$1" == "__test_cmd" ]; then
+    echo "tungnq - hello"
     exit 1
 fi
 
-if [ "$1" == "__uninstall" ]; then
-    rm -rf ${resource_path}
-    rm -rf /usr/local/bin/ios_deploy.sh
-    exit 1
-fi
+# ========== SETUP ==========
+# if [ "$1" == "__setup" ]; then
+#     # setup this script
+#     chmod +x ./ios_deploy
+#     cp ./ios_deploy /usr/local/bin
 
+#     # copy resource for use
+#     if [ ! -d "${resource_path}" ]; then
+#         mkdir ${resource_path}
+#     fi
+#     cp ./deploy_config.json ${resource_path}
+#     cp ./export_config.plist ${resource_path}
+#     cp -R ./hooks/ /usr/local/ios_deploy/hooks
+#     exit 1
+# fi
+
+# ========== UNINSTALL ==========
+# if [ "$1" == "__uninstall" ]; then
+#     rm -rf ${resource_path}
+#     rm -rf /usr/local/bin/ios_deploy
+#     exit 1
+# fi
+
+# ========== INIT ==========
 if [ "$1" == "init" ]; then
     # get resource
     if [ ! -d "${resource_path}" ]; then
-        echo "=> Resource not found, please 'sudo sh ios_deploy __setup' to setup this framework"
+        echo "=> Resource not found, please 'brew upgrade ios_deploy'"
         exit 1
     fi
 
@@ -40,8 +52,8 @@ if [ "$1" == "init" ]; then
     mkdir ${deploy_path}
 
     # ... deploy_config & export_config files
-    cp -R ${resource_path}/export_config.plist ${deploy_path}/export_config.plist
-    cp -R ${resource_path}/deploy_config.json ${deploy_path}/deploy_config.json
+    cp -R ${resource_path}/config/export_config.plist ${deploy_path}/export_config.plist
+    cp -R ${resource_path}/config/deploy_config.json ${deploy_path}/deploy_config.json
 
     # ... hooks dir and files inside
     mkdir ${deploy_path}/hooks
@@ -62,14 +74,14 @@ fi
 # check input argument
 is_archive=0
 is_export=0
-if [ "$1" == "arc" ]; then
+if [ "$1" == "-a" ]; then
     is_archive=1
     echo "ARCHIVE"
-elif [ "$1" == "exp" ]; then
+elif [ "$1" == "-e" ]; then
     is_export=1
     echo "EXPORT"
 else
-    echo "=> Argument not found, ex: ios_deploy arc, ..."
+    echo "=> Argument not found, ex: ios_deploy -a, ..."
     exit 1
 fi
 
