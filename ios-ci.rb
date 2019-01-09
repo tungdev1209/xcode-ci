@@ -1,4 +1,4 @@
-class HomebrewIosCi < Formula
+class IosCi < Formula
   desc "Build, archive & export iOS/MacOS app via command-line"
   homepage "https://github.com/tungdev1209/homebrew-ios-ci"
   version "1.0.1"
