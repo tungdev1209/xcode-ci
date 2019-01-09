@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.1"
+version="1.0.3"
 
 # the resource path
 resource_path="$(brew --cellar ios-ci)/$version"

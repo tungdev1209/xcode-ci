@@ -5,3 +5,7 @@ if [ "$1" == "push" ] && [ "$2" != "" ]; then
     git push
     git status
 fi
+if [ "$1" == "release" ] && [ "$2" != "" ]; then
+    git tag $2
+    git push origin $2
+fi
