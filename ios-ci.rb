@@ -11,7 +11,6 @@ class IosCi < Formula
     prefix.install "README.md"
     prefix.install "hooks"
     prefix.install "config"
-    system "chmod", "+x", "$(brew --cellar)/ios-ci/1.0.1/bin/ios-ci"
   end
 
   test do
