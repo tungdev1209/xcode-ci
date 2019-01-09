@@ -5,18 +5,11 @@ class IosCi < Formula
   sha256 "adc7192ebd09dbb994b3245739ec7eb0a4c8b76030dbbae85fe94ddff36637b7"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--disable-maintainer-mode",
-                          "--prefix=#{prefix}"
-
     bin.install "ios-ci"
     prefix.install "Author"
     prefix.install "README.md"
     prefix.install "hooks"
     prefix.install "config"
-    
-    system "make", "install"
   end
 
   test do
