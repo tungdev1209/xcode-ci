@@ -6,7 +6,7 @@ class IosCi < Formula
   sha256 "615dba929c555eaca2309e4f9ace8eea03e95aab3afb7d75c730e97a5f6b7dfc"
 
   def install
-    bin.install "ios-ci"
+    bin.install "ios-ci.sh"
     prefix.install "Author"
     prefix.install "README.md"
     prefix.install "hooks"
