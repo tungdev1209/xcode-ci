@@ -75,7 +75,7 @@ python ${helper_path}/py_jsoncreate.py -v "${ci_cmd_args}" -p ${process_path}
 # python helper/py_jsoncreate.py -v "${ci_cmd_args}" -p ./process.json
 
 process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path} "
-cmd_path="${deploy_path}/hooks"
+hooks_path="${deploy_path}/hooks"
 
 destroy()
 {
@@ -86,7 +86,11 @@ destroy()
 value=""
 get_value()
 {
-    value=$(jq ".$1" ${deploy_config_path} | tr -d \")
+    if [ "$2" == "" ]; then
+        value=$(jq ".$1" ${deploy_config_path} | tr -d \")
+    else
+        value=$(jq ".$1" $2 | tr -d \")
+    fi
 }
 
 # get the .xcodeproj path
@@ -124,7 +128,7 @@ if [ "${is_build}" == "1" ]; then
     fi
 
     # Run Pre Build job
-    sh ${cmd_path}/pre_build.sh ${deploy_config_path} ${build_path}
+    sh ${hooks_path}/pre_build.sh ${deploy_config_path} ${build_path}
 
     # Run Build job
     echo "=> Building... ${build_scheme}.app"
@@ -148,8 +152,8 @@ if [ "${is_build}" == "1" ]; then
     fi
     ${build_cmd}
 
-    # Run Post Archive job
-    sh ${cmd_path}/post_build.sh ${deploy_config_path} ${build_path}
+    # Run Post Build job
+    sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path}
 fi
 
 echo "${b}========== ARCHIVE ==========${n}"
@@ -161,7 +165,7 @@ if [ "${is_archive}" == "1" ]; then
     fi
 
     # Run Pre Archive job
-    sh ${cmd_path}/pre_archive.sh ${deploy_config_path} ${archive_path}
+    sh ${hooks_path}/pre_archive.sh ${deploy_config_path} ${archive_path}
 
     # Run Archive job
     echo "=> Archiving... ${archive_scheme}.xcarchive"
@@ -179,7 +183,7 @@ if [ "${is_archive}" == "1" ]; then
     fi
 
     # Run Post Archive job
-    sh ${cmd_path}/post_archive.sh ${deploy_config_path} ${archive_path} ${archive_scheme}.xcarchive
+    sh ${hooks_path}/post_archive.sh ${deploy_config_path} ${archive_path} ${archive_scheme}.xcarchive
 fi
 
 echo "${b}========== EXPORT ==========${n}"
@@ -208,7 +212,7 @@ if [ "${is_export}" == "1" ]; then
     mkdir ${export_path}
 
     # Run Pre Export job
-    sh ${cmd_path}/pre_export.sh ${deploy_config_path} ${export_path}
+    sh ${hooks_path}/pre_export.sh ${deploy_config_path} ${export_path}
 
     # Run Export job
     echo "=> Exporting... ${file_exported_name}"
@@ -225,7 +229,7 @@ if [ "${is_export}" == "1" ]; then
     fi
 
     # Run Post Export job
-    sh ${cmd_path}/post_export.sh ${deploy_config_path} ${export_path} ${file_exported_name}
+    sh ${hooks_path}/post_export.sh ${deploy_config_path} ${export_path} ${file_exported_name}
 fi
 
 destroy
