@@ -2,6 +2,17 @@
 
 project_dir="$1"
 product_des_input="$2"
+args="$3"
+
+# for framework
+project_type="$4"
+build_universal="$5"
+build_device="$6"
+build_simulator="$7"
+
+# setup for echo
+b=$(tput bold)
+n=$(tput sgr0)
 
 if [ "$1" == "" ]; then
     echo "ERROR: Must have project directory"
@@ -19,8 +30,8 @@ project_name=$(basename ${file_dir} ".xcodeproj")
 
 product_des=${product_des_input}
 simulator_dir=${product_des}/Simulator
-device_dir=${product_des}/Production
-universal_dir=${product_des}/Development
+device_dir=${product_des}/Device
+universal_dir=${product_des}/Universal
 project_binary="${project_name}.framework/${project_name}"
 project_dSYM_binary="${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}"
 
@@ -31,21 +42,35 @@ rm -rf ${universal_dir}
 if [ ! -d "${product_des}" ]; then
     mkdir ${product_des}
 fi
+
+xcodebuild_cmd="xcodebuild -project ${project_dir}/${project_name}.xcodeproj -scheme ${project_name} build"
+
+if [ "${project_type}" != "-fw" ]; then # build non-fw project
+    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
+    echo "execute >> ${b}${build_cmd}${n}"
+    ${build_cmd}
+    exit 1
+fi
+
+if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
+    mkdir ${simulator_dir}
+    build_cmd="${xcodebuild_cmd} -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
+    echo "execute >> ${b}${build_cmd}${n}"
+    ${build_cmd}
+fi
+if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
+    mkdir ${device_dir}
+    build_cmd="${xcodebuild_cmd} -sdk iphoneos CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
+    echo "execute >> ${b}${build_cmd}${n}"
+    ${build_cmd}
+fi
+
+if [ "${build_universal}" == "0" ]; then
+    exit 1
+fi
+
+mkdir ${universal_dir}
 mkdir ${universal_dir}/${project_name}.framework
-mkdir ${simulator_dir}
-mkdir ${device_dir}
-
-xcodebuild_cmd="xcodebuild -project ${project_dir}/${project_name}.xcodeproj \
--scheme ${project_name} \
--configuration Release \
-ONLY_ACTIVE_ARCH=NO \
-ENABLE_BITCODE=YES \
-OTHER_CFLAGS='-fembed-bitcode' \
-BITCODE_GENERATION_MODE=bitcode \
-clean build "
-
-${xcodebuild_cmd} -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${simulator_dir}
-${xcodebuild_cmd} -sdk iphoneos CONFIGURATION_BUILD_DIR=${device_dir}
 
 echo "=== combine dSYM files ==="
 cp -R ${device_dir}/${project_name}.framework.dSYM ${universal_dir}
@@ -70,4 +95,9 @@ lipo "${simulator_dir}/${project_binary}" "${device_dir}/${project_binary}" -cre
 rsync -av ${device_dir}/${project_name}.framework/ ${universal_dir}/${project_name}.framework/ --exclude ${project_name}
 cp -R ${simulator_dir}/${project_name}.framework/Modules/${project_name}.swiftmodule/. ${universal_dir}/${project_name}.framework/Modules/${project_name}.swiftmodule
 
-rm -rf ${simulator_dir}
+if [ "${build_simulator}" == "0" ]; then
+    rm -rf ${simulator_dir}
+fi
+if [ "${build_device}" == "0" ]; then
+    rm -rf ${device_dir}
+fi
