@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.6"
+version="1.0.1"
 
 # the resource path
 resource_path="$(brew --cellar ios-ci)/$version"
@@ -10,30 +10,11 @@ if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     exit 1
 fi
 
-# ========== SETUP ==========
-# if [ "$1" == "__setup" ]; then
-#     # setup this script
-#     chmod +x ./ios-ci
-#     cp ./ios-ci /usr/local/bin
-
-#     # copy resource for use
-#     if [ ! -d "${resource_path}" ]; then
-#         mkdir ${resource_path}
-#     fi
-#     cp ./deploy_config.json ${resource_path}
-#     cp ./export_config.plist ${resource_path}
-#     cp -R ./hooks/ /usr/local/ios-ci/hooks
-#     exit 1
-# fi
-
-# ========== UNINSTALL ==========
-# if [ "$1" == "__uninstall" ]; then
-#     rm -rf ${resource_path}
-#     rm -rf /usr/local/bin/ios-ci
-#     exit 1
-# fi
-
 # ========== INIT ==========
+deploy_path="$(pwd)/.ci"
+export_config_name="export_config.plist"
+deploy_config_name="deploy_config.json"
+
 if [ "$1" == "init" ]; then
     # get resource
     if [ ! -d "${resource_path}" ]; then
@@ -41,7 +22,7 @@ if [ "$1" == "init" ]; then
         exit 1
     fi
 
-    deploy_path="./.deploy"
+    deploy_path="./.ci"
     if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
         echo "=> This project is initialized, please 'ios-ci init -f' to re-init"
         exit 1
@@ -52,8 +33,8 @@ if [ "$1" == "init" ]; then
     mkdir ${deploy_path}
 
     # ... deploy_config & export_config files
-    cp -R ${resource_path}/config/export_config.plist ${deploy_path}/export_config.plist
-    cp -R ${resource_path}/config/deploy_config.json ${deploy_path}/deploy_config.json
+    cp -R ${resource_path}/config/${export_config_name} ${deploy_path}/${export_config_name}
+    cp -R ${resource_path}/config/${deploy_config_name} ${deploy_path}/${deploy_config_name}
 
     # ... hooks dir and files inside
     mkdir ${deploy_path}/hooks
@@ -63,10 +44,10 @@ if [ "$1" == "init" ]; then
 fi
 
 # check this project is initialized?
-deploy_config_path="$(pwd)/.deploy/deploy_config.json"
+deploy_config_path="${deploy_path}/${deploy_config_name}"
 
 if [ ! -e "${deploy_config_path}" ]; then
-    echo "=> deploy_config.json not found at $(pwd)/.deploy"
+    echo "=> ${deploy_config_name} not found at ${deploy_path}"
     echo "=> Need initialize first: ios-ci init [-f]"
     exit 1
 fi
@@ -85,7 +66,7 @@ else
     exit 1
 fi
 
-cmd_path="$(pwd)/.deploy/hooks"
+cmd_path="${deploy_path}/hooks"
 
 # parse json func
 value=""
@@ -138,10 +119,10 @@ if [ $is_archive == 1 ]; then
 fi
 
 # ========== EXPORT ==========
-# path to export_config.plist
-export_config_path="$(pwd)/.deploy/export_config.plist"
+# path to ${export_config_name}
+export_config_path="${deploy_path}/${export_config_name}"
 if [ ! -e "${export_config_path}" ]; then
-    echo "=> export_config.plist not found at $(pwd)/.deploy"
+    echo "=> ${export_config_name} not found at ${deploy_path}"
     echo "=> Need initialize first: ios-ci init [-f]"
     exit 1
 fi
