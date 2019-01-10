@@ -6,5 +6,5 @@
     "build_scheme":"BuildSchemeName",
     "archive_args":"",
     "export_args":"",
-    "build_args":"-sdk iphonesimulator -configuration Release ONLY_ACTIVE_ARCH=NO ENABLE_BITCODE=YES OTHER_CFLAGS='-fembed-bitcode' BITCODE_GENERATION_MODE=bitcode clean"
+    "build_args":"-configuration Release ONLY_ACTIVE_ARCH=NO ENABLE_BITCODE=YES OTHER_CFLAGS='-fembed-bitcode' BITCODE_GENERATION_MODE=bitcode clean"
 }

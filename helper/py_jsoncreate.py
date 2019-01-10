@@ -3,7 +3,6 @@
 
 import json
 import argparse
-import subprocess
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -11,9 +10,9 @@ ap.add_argument("-v", "--value", required=True, help="values need convert to jso
 ap.add_argument("-p", "--path", required=True, help="path to json")
 args = vars(ap.parse_args())
 
-values = args["value"]
 json_path = args["path"]
-arr_values = values.split('##')
+values = args["value"]
+arr_values = values.split(';')
 
 json_content = {}
 json_content['build'] = {}
@@ -70,6 +69,10 @@ for value in arr_values:
         continue
     elif is_framework:
         libs = value.split('.')
+        if len(libs) > 0:
+            json_content['framework']['universal'] = '0'
+            json_content['framework']['device'] = '0'
+            json_content['framework']['simulator'] = '0'
         for lib in libs:
             if lib == 'u':
                 json_content['framework']['universal'] = '1'

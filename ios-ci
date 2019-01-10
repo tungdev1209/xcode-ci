@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.5"
+version="1.0.6"
 
 if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     echo $version
@@ -11,6 +11,7 @@ fi
 resource_path="$(brew --cellar ios-ci)/$version"
 helper_path="${resource_path}/helper"
 deploy_path="$(pwd)/.ci"
+hooks_path="${deploy_path}/hooks"
 export_config_name="export_config.plist"
 deploy_config_name="deploy_config.json"
 deploy_config_path="${deploy_path}/${deploy_config_name}"
@@ -24,7 +25,7 @@ n=$(tput sgr0)
 if [ "$1" == "init" ]; then
     # get resource
     if [ ! -d "${resource_path}" ]; then
-        echo "=> Resource not found, please 'brew upgrade ios-ci'"
+        echo "=> Resource not found, please 'brew reinstall ios-ci'"
         exit 1
     fi
 
@@ -58,13 +59,13 @@ fi
 
 # check input argument
 # get extend args
-ci_cmd_args=$1
+ci_cmd_args=";$1"
 declare -i arg_num=0
 for var in "$@"
 do
     arg_num=$(( arg_num + 1 ))
     if (( arg_num > 1 )); then # already keep $1
-        ci_cmd_args="${ci_cmd_args}##${var}"
+        ci_cmd_args+=";${var}"
     fi
 done
 
@@ -72,10 +73,7 @@ done
 process_path="${deploy_path}/process.json"
 touch ${process_path}
 python ${helper_path}/py_jsoncreate.py -v "${ci_cmd_args}" -p ${process_path}
-# python helper/py_jsoncreate.py -v "${ci_cmd_args}" -p ./process.json
-
 process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path} "
-hooks_path="${deploy_path}/hooks"
 
 destroy()
 {
@@ -119,9 +117,10 @@ project_full_name=$(find ${project_path} -iname '*.xcodeproj')
 project_name=$(basename ${project_full_name} ".xcodeproj")
 project_file_path="${project_path}/${project_name}.xcodeproj"
 
-echo "${b}========== BUILD ==========${n}"
 is_build=$(${process_value_cmd} -k build/run)
 if [ "${is_build}" == "1" ]; then
+    echo "${b}========== BUILD ==========${n}"
+
     # create dir if needed
     if [ ! -d "${build_path}" ]; then
         mkdir ${build_path}
@@ -131,9 +130,10 @@ if [ "${is_build}" == "1" ]; then
     sh ${hooks_path}/pre_build.sh ${deploy_config_path} ${build_path}
 
     # Run Build job
-    echo "=> Building... ${build_scheme}.app"
+    echo "=> Building... ${build_scheme}"
     get_value build_args
     build_args="$(${process_value_cmd} -k build/args) ${value}"
+    build_args=$(echo "$build_args" | tr ' ' ';')
     build_cmd="sh ${helper_path}/ios_build.sh ${project_path} ${build_path} ${build_args} "
     
     # is building for framework?
@@ -156,9 +156,9 @@ if [ "${is_build}" == "1" ]; then
     sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path}
 fi
 
-echo "${b}========== ARCHIVE ==========${n}"
 is_archive=$(${process_value_cmd} -k archive/run)
 if [ "${is_archive}" == "1" ]; then
+    echo "${b}========== ARCHIVE ==========${n}"
     # create dir if needed
     if [ ! -d "${archive_path}" ]; then
         mkdir ${archive_path}
@@ -186,9 +186,9 @@ if [ "${is_archive}" == "1" ]; then
     sh ${hooks_path}/post_archive.sh ${deploy_config_path} ${archive_path} ${archive_scheme}.xcarchive
 fi
 
-echo "${b}========== EXPORT ==========${n}"
 is_export=$(${process_value_cmd} -k export/run)
 if [ "${is_export}" == "1" ]; then
+    echo "${b}========== EXPORT ==========${n}"
     # check this project is initialized?
     if [ ! -e "${export_config_path}" ]; then
         echo "=> ${export_config_name} not found at ${deploy_path}"
