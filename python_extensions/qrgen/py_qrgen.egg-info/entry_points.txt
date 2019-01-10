@@ -1,3 +1,0 @@
-[console_scripts]
-py_qrgen = py_qrgen:run
-

@@ -47,6 +47,11 @@ xcodebuild_cmd="xcodebuild -project ${project_dir}/${project_name}.xcodeproj -sc
 args=$(echo "$args" | tr ';' ' ')
 
 if [ "${project_type}" != "-fw" ]; then # build non-fw project
+    # set default sdk
+    if [[ $args != *"-sdk "* ]]; then
+        args+=" -sdk iphonesimulator"
+    fi
+    
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
     echo "execute >> ${b}${build_cmd}${n}"
     ${build_cmd}

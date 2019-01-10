@@ -1,6 +1,0 @@
-setup.py
-py_qrgen.egg-info/PKG-INFO
-py_qrgen.egg-info/SOURCES.txt
-py_qrgen.egg-info/dependency_links.txt
-py_qrgen.egg-info/entry_points.txt
-py_qrgen.egg-info/top_level.txt
