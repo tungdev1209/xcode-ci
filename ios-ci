@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.7"
+version="1.0.8"
 
 if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     echo $version
@@ -171,7 +171,7 @@ if [ "${is_archive}" == "1" ]; then
     echo "=> Archiving... ${archive_scheme}.xcarchive"
     get_value archive_args
     archive_args="$(${process_value_cmd} -k archive/args) ${value}"
-    archive_cmd="xcodebuild -project ${project_file_path} -scheme ${archive_scheme} -configuration Release archive -archivePath ${archive_file_path} ${archive_args}"
+    archive_cmd="xcodebuild -project ${project_file_path} -scheme ${archive_scheme} archive -archivePath ${archive_file_path} ${archive_args}"
     echo "execute >> ${b}${archive_cmd}${n}"
     ${archive_cmd}
 

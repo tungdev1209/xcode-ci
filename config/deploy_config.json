@@ -4,7 +4,7 @@
     "archive_scheme":"ArchiveSchemeName",
     "build_path":"./Build",
     "build_scheme":"BuildSchemeName",
-    "archive_args":"",
+    "archive_args":"-configuration Release",
     "export_args":"",
-    "build_args":"-configuration Debug ONLY_ACTIVE_ARCH=NO clean"
+    "build_args":"-sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO clean"
 }
