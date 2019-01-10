@@ -1,1 +1,0 @@
-{"test": {"args": "", "run": "1"}, "export": {"args": "something export config", "run": "0"}, "build": {"args": "configuration Debug clean", "run": "0"}, "archive": {"args": "", "run": "1"}}
