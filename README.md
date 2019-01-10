@@ -1,7 +1,7 @@
 # ios-ci
 
 ## Description
-Build, archive, export,... iOS/MacOS app via command line.   
+Build, Archive, Export,... iOS/MacOS app via command line.   
 
 ## Requirements
 xcodebuild
@@ -68,13 +68,13 @@ Syntax:
 ```sh
 $ ios-ci <cmd>
 ```
-* ```init [-f]``` - Initialize deploy components (-f force re-init)
+* ```init [-f]``` - Initialize deploy components (```-f``` force re-init)
 * ```-a 'archive args'``` : Additional Archive command arguments (plus archive_args value in deploy_config.json in order to make final Archive command)
 * ```-e 'export args'``` : Additional Export command arguments (plus export_args value in deploy_config.json in order to make final Export command)
 * ```-b 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
 * ```-t``` : Add test to Build command
-* ```-fw 'u.d.s'``` : Indicate this is the framework project, 'u' if you just want to export Universal framework, 'd' => Device framework and 's' => Simulator framework, 'u.d' if you would both Universal & Device frameworks. Default: export all kind of frameworks if you just -fw, if you don't -fw, ios-ci understand this is normal application project
-* ```-r 'b.a.e'``` : Indicate whether ci process will be run or not, 'b' if you just want to run Build process, 'a' => Archive process and 'e' => Export process, 'a.e' if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Archive -> Export) if you don't type -r
+* ```-fw 'u.d.s'``` : Indicate this is the framework project, ```'u'``` if you just want to export Universal framework, ```'d'``` => Device framework and ```'s'``` => Simulator framework, ```'u.d'``` if you would both Universal & Device frameworks. Default: export all kind of frameworks if you just ```-fw```, if you don't ```-fw```, **ios-ci** understand this is normal application project
+* ```-r 'b.a.e'``` : Indicate whether ci process will be run or not, ```'b'``` if you just want to run Build process, ```'a'``` => Archive process and ```'e'``` => Export process, ```'a.e'``` if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Archive -> Export) if you don't type ```-r```
 * ```--version``` : show the version
 
 ## Hooks
@@ -101,6 +101,6 @@ $ ios-ci -r 'b'
 $ ios-ci -fw 'u.d' -r 'a.e'
 ```
 
-**Be careful, because ios-ci add more process args by 2 ways, via command line (-a -e -b) and via deploy_config.json, and the final process cmd-line will merge all args at 2 places, processes will be fail if one of the args appear twice**
+**=> Be careful, because ios-ci add more process args by 2 ways, via command line (-a -e -b) and via deploy_config.json, and the final process cmd-line will merge all args at 2 places, processes will be fail if one of the args appear twice**
 
 Have fun!
