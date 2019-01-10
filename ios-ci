@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.8"
+version="1.0.9"
 
 if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     echo $version
@@ -132,7 +132,15 @@ if [ "${is_build}" == "1" ]; then
     # Run Build job
     echo "=> Building... ${build_scheme}"
     get_value build_args
-    build_args="$(${process_value_cmd} -k build/args) ${value}"
+    config_args=$value
+    cmd_input_args=$(${process_value_cmd} -k build/args)
+    build_args="${config_args} ${cmd_input_args}"
+    # test?
+    is_test=$(${process_value_cmd} -k test/run)
+    if [ "${is_test}" == "1" ]; then
+        build_args+=" test"
+    fi
+    
     build_args=$(echo "$build_args" | tr ' ' ';')
     build_cmd="sh ${helper_path}/ios_build.sh ${project_path} ${build_path} ${build_args} "
     
@@ -142,14 +150,9 @@ if [ "${is_build}" == "1" ]; then
         is_universal=$(${process_value_cmd} -k framework/universal)
         is_simulator=$(${process_value_cmd} -k framework/simulator)
         is_device=$(${process_value_cmd} -k framework/device)
-        build_cmd+=" -fw ${is_universal} ${is_device} ${is_simulator} "
+        build_cmd+="-fw ${is_universal} ${is_device} ${is_simulator} "
     fi
 
-    # test?
-    is_test=$(${process_value_cmd} -k test/run)
-    if [ "${is_test}" == "1" ]; then
-        build_cmd+="test"
-    fi
     ${build_cmd}
 
     # Run Post Build job
@@ -169,9 +172,18 @@ if [ "${is_archive}" == "1" ]; then
 
     # Run Archive job
     echo "=> Archiving... ${archive_scheme}.xcarchive"
+
+    # get all archive args
     get_value archive_args
-    archive_args="$(${process_value_cmd} -k archive/args) ${value}"
-    archive_cmd="xcodebuild -project ${project_file_path} -scheme ${archive_scheme} archive -archivePath ${archive_file_path} ${archive_args}"
+    default_args="-project ${project_file_path} -scheme ${archive_scheme} -archivePath ${archive_file_path} -configuration Release archive"
+    config_args=${value}
+    cmd_input_args=$(${process_value_cmd} -k archive/args)
+    full_archive_args="${default_args} ${config_args} ${cmd_input_args}"
+    full_archive_args=$(echo ";$full_archive_args" | tr ' ' ';')
+    archive_args=$(python ${helper_path}/py_merge_args.py -a ${full_archive_args})
+
+    # get final archive cmd
+    archive_cmd="xcodebuild ${archive_args}"
     echo "execute >> ${b}${archive_cmd}${n}"
     ${archive_cmd}
 
@@ -216,9 +228,18 @@ if [ "${is_export}" == "1" ]; then
 
     # Run Export job
     echo "=> Exporting... ${file_exported_name}"
+
+    # get all archive args
     get_value export_args
-    export_args="$(${process_value_cmd} -k export/args) ${value}"
-    export_cmd="xcodebuild -exportArchive -archivePath ${archive_file_path} -exportOptionsPlist ${export_config_path} -exportPath ${export_path} ${export_args}"
+    default_args="-exportArchive -archivePath ${archive_file_path} -exportOptionsPlist ${export_config_path} -exportPath ${export_path}"
+    config_args=${value}
+    cmd_input_args=$(${process_value_cmd} -k export/args)
+    full_export_args="${default_args} ${config_args} ${cmd_input_args}"
+    full_export_args=$(echo ";$full_export_args" | tr ' ' ';')
+    export_args=$(python ${helper_path}/py_merge_args.py -a ${full_export_args})
+
+    # get the export cmd
+    export_cmd="xcodebuild ${export_args}"
     echo "execute >> ${b}${export_cmd}${n}"
     ${export_cmd}
 

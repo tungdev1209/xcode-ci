@@ -23,7 +23,7 @@ json_content['framework'] = {}
 
 # set default value
 json_content['build']['run'] = '1'
-json_content['test']['run'] = '1'
+json_content['test']['run'] = '0'
 json_content['archive']['run'] = '1'
 json_content['export']['run'] = '1'
 
@@ -85,16 +85,12 @@ for value in arr_values:
 
     if value == '-b':
         is_build_args = True
-        continue
     elif value == '-t':
         json_content['test']['run'] = '1'
-        continue
     elif value == '-a':
         is_archive_args = True
-        continue
     elif value == '-e':
         is_export_args = True
-        continue
     elif value == '-r':
         json_content['build']['run'] = '0'
         json_content['archive']['run'] = '0'
@@ -103,7 +99,6 @@ for value in arr_values:
     elif value == '-fw':
         is_framework = True
         json_content['framework']['run'] = '1'
-        continue
 
 f = open(json_path, 'wt')
 json.dump(json_content, f)

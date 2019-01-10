@@ -28,6 +28,8 @@ product_des_input="$(pwd)/${product_des_input}"
 file_dir=$(find ${project_dir} -iname '*.xcodeproj')
 project_name=$(basename ${file_dir} ".xcodeproj")
 
+helper_path=$(dirname "$0")
+
 product_des=${product_des_input}
 simulator_dir=${product_des}/Simulator
 device_dir=${product_des}/Device
@@ -43,10 +45,11 @@ if [ ! -d "${product_des}" ]; then
     mkdir ${product_des}
 fi
 
-xcodebuild_cmd="xcodebuild -project ${project_dir}/${project_name}.xcodeproj -scheme ${project_name} build"
-args=$(echo "$args" | tr ';' ' ')
+xcodebuild_cmd="xcodebuild"
+full_args=";-project;${project_dir}/${project_name}.xcodeproj;-scheme;${project_name};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
 
 if [ "${project_type}" != "-fw" ]; then # build non-fw project
+    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
     echo "execute >> ${b}${build_cmd}${n}"
     ${build_cmd}
@@ -55,13 +58,17 @@ fi
 
 if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     mkdir ${simulator_dir}
-    build_cmd="${xcodebuild_cmd} -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
+    full_args+=";-sdk;iphonesimulator"
+    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
+    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
     ${build_cmd}
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
-    build_cmd="${xcodebuild_cmd} -sdk iphoneos CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
+    full_args+=";-sdk;iphoneos"
+    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
+    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
     echo "execute build device framework >> ${b}${build_cmd}${n}"
     ${build_cmd}
 fi
