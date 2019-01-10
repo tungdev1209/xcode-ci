@@ -7,9 +7,10 @@ Build, Archive, Export,... iOS/MacOS app via command line.
 xcodebuild
 
 ## Install
-brew tap tungdev1209/ios-ci
-brew install ios-ci
-
+```sh
+$ brew tap tungdev1209/ios-ci
+$ brew install ios-ci
+```
 ## Initialize
 ```sh
 $ cd path/to/ios/project
