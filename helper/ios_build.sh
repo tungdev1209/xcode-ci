@@ -45,8 +45,10 @@ if [ ! -d "${product_des}" ]; then
     mkdir ${product_des}
 fi
 
+deploy_config_path="$(pwd)/.ci/deploy_config.json"
+build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
 xcodebuild_cmd="xcodebuild"
-full_args=";-project;${project_dir}/${project_name}.xcodeproj;-scheme;${project_name};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
+full_args=";-project;${project_dir}/${project_name}.xcodeproj;-scheme;${build_scheme};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
 
 if [ "${project_type}" != "-fw" ]; then # build non-fw project
     args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
