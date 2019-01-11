@@ -1,10 +1,11 @@
 {
     "project_path":".",
-    "archive_path":"./Archive",
-    "archive_scheme":"ArchiveSchemeName",
     "build_path":"./Build",
     "build_scheme":"BuildSchemeName",
+    "archive_path":"./Archive",
+    "archive_scheme":"ArchiveSchemeName",
+    "build_args":"clean",
+    "test_args":"",
     "archive_args":"",
-    "export_args":"",
-    "build_args":"clean"
+    "export_args":""
 }

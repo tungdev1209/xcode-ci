@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.10"
+version="1.0.11"
 
 if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     echo $version
@@ -135,12 +135,6 @@ if [ "${is_build}" == "1" ]; then
     config_args=$value
     cmd_input_args=$(${process_value_cmd} -k build/args)
     build_args="${config_args} ${cmd_input_args}"
-    # test?
-    is_test=$(${process_value_cmd} -k test/run)
-    if [ "${is_test}" == "1" ]; then
-        build_args+=" test"
-    fi
-    
     build_args=$(echo "$build_args" | tr ' ' ';')
     build_cmd="sh ${helper_path}/ios_build.sh ${project_path} ${build_path} ${build_args} "
     

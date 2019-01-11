@@ -14,6 +14,12 @@ build_simulator="$7"
 b=$(tput bold)
 n=$(tput sgr0)
 
+# global vars
+process_path="$(pwd)/.ci/process.json"
+deploy_config_path="$(pwd)/.ci/deploy_config.json"
+helper_path=$(dirname "$0")
+process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path} "
+
 if [ "$1" == "" ]; then
     echo "ERROR: Must have project directory"
     exit 1
@@ -27,8 +33,6 @@ product_des_input="$(pwd)/${product_des_input}"
 
 file_dir=$(find ${project_dir} -iname '*.xcodeproj')
 project_name=$(basename ${file_dir} ".xcodeproj")
-
-helper_path=$(dirname "$0")
 
 product_des=${product_des_input}
 simulator_dir=${product_des}/Simulator
@@ -45,10 +49,21 @@ if [ ! -d "${product_des}" ]; then
     mkdir ${product_des}
 fi
 
-deploy_config_path="$(pwd)/.ci/deploy_config.json"
 build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
 xcodebuild_cmd="xcodebuild"
 full_args=";-project;${project_dir}/${project_name}.xcodeproj;-scheme;${build_scheme};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
+
+# add test?
+is_test=$(${process_value_cmd} -k test/run)
+if [ "${is_test}" == "1" ]; then
+    # get all test args
+    default_args=""
+    config_args=$(jq ".test_args" ${deploy_config_path} | tr -d \")
+    cmd_input_args=$(${process_value_cmd} -k archive/args)
+    full_test_args="${default_args} ${config_args} ${cmd_input_args}"
+    full_test_args=$(echo ";test;$full_test_args" | tr ' ' ';')
+    full_args+=full_test_args
+fi
 
 if [ "${project_type}" != "-fw" ]; then # build non-fw project
     args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
