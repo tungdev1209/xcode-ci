@@ -28,13 +28,15 @@ After initialized, .deploy dir is created automatically, then you have to adjust
 ```
 {
     "project_path":".",
-    "archive_path":"./Archive",
-    "archive_scheme":"HelloWorld",
+    "project_name":"HelloWorld.xcodeproj",
     "build_path":"./Build",
     "build_scheme":"HelloWorld",
+    "archive_path":"./Archive",
+    "archive_scheme":"HelloWorld",
+    "build_args":"clean",
+    "test_args":"",
     "archive_args":"",
-    "export_args":"",
-    "build_args":"-sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO clean"
+    "export_args":""
 }
 ```
 
@@ -71,26 +73,29 @@ Syntax:
 $ ios-ci <command>
 ```
 * ```init [-f]``` - Initialize deploy components (```-f``` force re-init)
+* ```-b 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
+* ```-t 'test args'``` : Additional Test command arguments (plus test_args value in deploy_config.json in order to make final Test command)
 * ```-a 'archive args'``` : Additional Archive command arguments (plus archive_args value in deploy_config.json in order to make final Archive command)
 * ```-e 'export args'``` : Additional Export command arguments (plus export_args value in deploy_config.json in order to make final Export command)
-* ```-b 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
-* ```-t``` : Add test to Build command
 * ```-fw 'u.d.s'``` : Indicate this is the framework project, ```'u'``` if you just want to export Universal framework, ```'d'``` => Device framework and ```'s'``` => Simulator framework, ```'u.d'``` if you would both Universal & Device frameworks. Default: export all kind of frameworks if you just ```-fw```, if you don't ```-fw```, **ios-ci** understand this is normal application project
-* ```-r 'b.a.e'``` : Indicate whether ci process will be run or not, ```'b'``` if you just want to run Build process, ```'a'``` => Archive process and ```'e'``` => Export process, ```'a.e'``` if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Archive -> Export) if you don't type ```-r```
+* ```-r 'b.t.a.e'``` : Indicate whether ci process will be run or not, ```'b'``` if you just want to run Build process, ```'t'``` => Test process, ```'a'``` => Archive process and ```'e'``` => Export process, ```'a.e'``` if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Test -> Archive -> Export) if you don't type ```-r```
 * ```--version``` : show the version
 
 ## Default arguments
-* Build : ```-project project_path/project_name.xcodeproj -scheme build_scheme -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build``` (project_name: the .xcodeproj file at project_path)
-* Archive : ```-project project_path/project_name.xcodeproj -scheme archive_scheme -archivePath archive_path/archive_scheme.xcarchive -configuration Release archive```
+By default, **ios-ci** detect current type of project you would like to build (whether project or workspace) by project_name value (whether .xcodeproj or .xcworkspace) in deploy_config.json in order to make final Build command
+
+* Build : ```-project (or -workspace) project_path/project_name -scheme build_scheme -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build```
+* Test : ```test```
+* Archive : ```-project (or -workspace) project_path/project_name -scheme archive_scheme -archivePath archive_path/archive_scheme.xcarchive -configuration Release archive```
 * Export : ```-exportArchive -archivePath archive_path/archive_scheme.xcarchive -exportOptionsPlist ./.ci/export_config.plist -exportPath archive_path/export_path``` (export_path: auto generate each time **ios-ci** run Export process)
 
-You could override above args via deploy_config.json and **ios-ci** command
+You could override above args via deploy_config.json and **ios-ci** command   
 
 ## Hooks
 ```sh
 $ ios-ci
 ```
-Above command means: **ios-ci** will run all of the processes one by one (Build -> Archive -> Export) with config files (deploy_config.json and export_config.plist). Before and after each process, **ios-ci** allow you add more processes you would like to run via ./hooks file
+Above command means: **ios-ci** will run all of the processes one by one (Build -> Test -> Archive -> Export) with config files (deploy_config.json and export_config.plist). Before and after each process, **ios-ci** allow you add more processes you would like to run via ./hooks file
 * pre_build.sh
 * post_build.sh
 * pre_archive.sh
