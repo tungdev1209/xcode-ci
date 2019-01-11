@@ -31,8 +31,12 @@ fi
 project_dir="$(pwd)/${project_dir}"
 product_des_input="$(pwd)/${product_des_input}"
 
-file_dir=$(find ${project_dir} -iname '*.xcodeproj')
-project_name=$(basename ${file_dir} ".xcodeproj")
+project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
+if [[ ${project_full_name} == *".xcodeproj" ]]; then
+    project_name=$(basename ${project_full_name} ".xcodeproj")
+else
+    project_name=$(basename ${project_full_name} ".xcworkspace")
+fi
 
 product_des=${product_des_input}
 simulator_dir=${product_des}/Simulator
@@ -51,7 +55,7 @@ fi
 
 build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
 xcodebuild_cmd="xcodebuild"
-full_args=";-project;${project_dir}/${project_name}.xcodeproj;-scheme;${build_scheme};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
+full_args=";-scheme;${build_scheme};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
 
 # add test?
 is_test=$(${process_value_cmd} -k test/run)

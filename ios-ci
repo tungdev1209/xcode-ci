@@ -113,9 +113,15 @@ archive_path=${value}
 archive_file_path="${archive_path}/${archive_scheme}.xcarchive"
 
 # global vars
-project_full_name=$(find ${project_path} -iname '*.xcodeproj')
-project_name=$(basename ${project_full_name} ".xcodeproj")
-project_file_path="${project_path}/${project_name}.xcodeproj"
+get_value project_name
+project_full_name=${value}
+
+# check type of build
+if [[ ${project_full_name} == *".xcodeproj" ]]; then
+    project_build_type_cmd="-project ${project_path}/${project_full_name}"
+else
+    project_build_type_cmd="-workspace ${project_path}/${project_full_name}"
+fi
 
 is_build=$(${process_value_cmd} -k build/run)
 if [ "${is_build}" == "1" ]; then
@@ -134,7 +140,7 @@ if [ "${is_build}" == "1" ]; then
     get_value build_args
     config_args=$value
     cmd_input_args=$(${process_value_cmd} -k build/args)
-    build_args="${config_args} ${cmd_input_args}"
+    build_args="${project_build_type_cmd} ${config_args} ${cmd_input_args}"
     build_args=$(echo "$build_args" | tr ' ' ';')
     build_cmd="sh ${helper_path}/ios_build.sh ${project_path} ${build_path} ${build_args} "
     
@@ -169,7 +175,7 @@ if [ "${is_archive}" == "1" ]; then
 
     # get all archive args
     get_value archive_args
-    default_args="-project ${project_file_path} -scheme ${archive_scheme} -archivePath ${archive_file_path} -configuration Release archive"
+    default_args="${project_build_type_cmd} -scheme ${archive_scheme} -archivePath ${archive_file_path} -configuration Release archive"
     config_args=${value}
     cmd_input_args=$(${process_value_cmd} -k archive/args)
     full_archive_args="${default_args} ${config_args} ${cmd_input_args}"
