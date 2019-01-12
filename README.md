@@ -72,14 +72,14 @@ Syntax:
 ```sh
 $ ios-ci <command>
 ```
-* ```init [-f]``` - Initialize deploy components (```-f``` force re-init)
-* ```-b 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
-* ```-t 'test args'``` : Additional Test command arguments (plus test_args value in deploy_config.json in order to make final Test command)
-* ```-a 'archive args'``` : Additional Archive command arguments (plus archive_args value in deploy_config.json in order to make final Archive command)
-* ```-e 'export args'``` : Additional Export command arguments (plus export_args value in deploy_config.json in order to make final Export command)
-* ```-fw 'u.d.s'``` : Indicate this is the framework project, ```'u'``` if you just want to export Universal framework, ```'d'``` => Device framework and ```'s'``` => Simulator framework, ```'u.d'``` if you would both Universal & Device frameworks. Default: export all kind of frameworks if you just ```-fw```, if you don't ```-fw```, **ios-ci** understand this is normal application project
-* ```-r 'b.t.a.e'``` : Indicate whether ci process will be run or not, ```'b'``` if you just want to run Build process, ```'t'``` => Test process, ```'a'``` => Archive process and ```'e'``` => Export process, ```'a.e'``` if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Test -> Archive -> Export) if you don't type ```-r```
-* ```--version``` : show the version
+* ```init [-f/--force]``` : Initialize ci components (```-f``` force re-init)
+* ```-b/--build 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
+* ```-t/--test 'test args'``` : Additional Test command arguments (plus test_args value in deploy_config.json in order to make final Test command)
+* ```-a/--archive 'archive args'``` : Additional Archive command arguments (plus archive_args value in deploy_config.json in order to make final Archive command)
+* ```-e/--export 'export args'``` : Additional Export command arguments (plus export_args value in deploy_config.json in order to make final Export command)
+* ```-fw/--framework 'u.d.s'``` : Indicate this is the framework project, ```'u'``` if you just want to export Universal framework, ```'d'``` => Device framework and ```'s'``` => Simulator framework, ```'u.d'``` if you would both Universal & Device frameworks. Default: export all kind of frameworks if you just ```-fw```, if you don't ```-fw```, **ios-ci** understand this is normal application project
+* ```-r/--run 'b.t.a.e'``` : Indicate whether ci process will be run or not, ```'b'``` if you just want to run Build process, ```'t'``` => Test process, ```'a'``` => Archive process and ```'e'``` => Export process, ```'a.e'``` if you would like to run Archive and then Export process. Default: run all kind of processes one by one (Build -> Test -> Archive -> Export) if you don't type ```-r```
+* ```-v/--version``` : show the version
 
 ## Default arguments
 By default, **ios-ci** detect current type of project you would like to build (whether project or workspace) by project_name value (whether .xcodeproj or .xcworkspace) in deploy_config.json in order to make final Build command
