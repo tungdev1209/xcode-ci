@@ -3,6 +3,10 @@
 export_path="$1"
 archive_file_path="$2"
 
+# setup for echo
+b=$(tput bold)
+n=$(tput sgr0)
+
 # global vars
 deploy_config_path="$(pwd)/.ci/deploy_config.json"
 export_config_path="$(pwd)/.ci/export_config.plist"

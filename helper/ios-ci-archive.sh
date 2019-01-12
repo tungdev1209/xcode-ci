@@ -4,6 +4,10 @@ project_file_path="$1"
 archive_path="$2"
 archive_scheme="$3"
 
+# setup for echo
+b=$(tput bold)
+n=$(tput sgr0)
+
 # global vars
 deploy_config_path="$(pwd)/.ci/deploy_config.json"
 process_path="$(pwd)/.ci/process.json"
