@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.12"
+version="1.0.13"
 
 if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
     echo $version
