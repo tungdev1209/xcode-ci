@@ -91,21 +91,21 @@ for value in arr_values:
         is_framework = False
         continue
 
-    if value == '-b':
+    if value == '-b' or value == '--build':
         is_build_args = True
-    elif value == '-t':
+    elif value == '-t' or value == '--test':
         is_test_args = True
-    elif value == '-a':
+    elif value == '-a' or value == '--archive':
         is_archive_args = True
-    elif value == '-e':
+    elif value == '-e' or value == '--export':
         is_export_args = True
-    elif value == '-r':
+    elif value == '-r' or value =='--run':
         json_content['build']['run'] = '0'
         json_content['test']['run'] = '0'
         json_content['archive']['run'] = '0'
         json_content['export']['run'] = '0'
         is_choose_process = True
-    elif value == '-fw':
+    elif value == '-fw' or value == '--framework':
         is_framework = True
         json_content['framework']['run'] = '1'
 

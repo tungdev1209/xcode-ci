@@ -2,7 +2,12 @@
 
 version="1.0.13"
 
-if [ "$1" == "__test_cmd" ] || [ "$1" == "--version" ]; then
+if [ "$1" == "__test_cmd" ]; then
+    echo "ok"
+    exit 1
+fi
+
+if [ "$1" == "-v" ] || [ "$1" == "--version" ]; then
     echo $version
     exit 1
 fi
@@ -30,9 +35,11 @@ if [ "$1" == "init" ]; then
     fi
 
     deploy_path="./.ci"
-    if [ -d "${deploy_path}" ] && [ "$2" != "-f" ]; then
-        echo "=> This project is initialized, please 'ios-ci init -f' to re-init"
-        exit 1
+    if [ -d "${deploy_path}" ]; then
+        if [ "$2" != "-f" ] && [ "$2" != "--force" ]; then
+            echo "=> This project is initialized, please 'ios-ci init -f' to re-init"
+            exit 1
+        fi
     fi
 
     # Create deploy path...
