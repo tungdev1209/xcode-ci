@@ -84,9 +84,9 @@ $ ios-ci <command>
 ## Default arguments
 By default, **ios-ci** detect current type of project you would like to build (whether project or workspace) by project_name value (whether .xcodeproj or .xcworkspace) in deploy_config.json in order to make final Build command
 
-* Build : ```-project (or -workspace) project_path/project_name -scheme build_scheme -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build```
+* Build : ```-project/-workspace project_path/project_name -scheme build_scheme -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build```
 * Test : ```test```
-* Archive : ```-project (or -workspace) project_path/project_name -scheme archive_scheme -archivePath archive_path/archive_scheme.xcarchive -configuration Release archive```
+* Archive : ```-project/-workspace project_path/project_name -scheme archive_scheme -archivePath archive_path/archive_scheme.xcarchive -configuration Release archive```
 * Export : ```-exportArchive -archivePath archive_path/archive_scheme.xcarchive -exportOptionsPlist ./.ci/export_config.plist -exportPath archive_path/export_path``` (export_path: auto generate each time **ios-ci** run Export process)
 
 You could override above args via deploy_config.json and **ios-ci** command   
