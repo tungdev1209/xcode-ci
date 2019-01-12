@@ -115,4 +115,8 @@ $ ios-ci -r 'b'
 $ ios-ci -fw 'u.d' -r 'a.e'
 ```
 
+## License
+This project is licensed under the terms of the MIT license.
+
+
 Have fun!
