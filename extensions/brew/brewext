@@ -1,0 +1,5 @@
+commit_cmt="$1"
+version="$2"
+gitext push $commit_cmt
+gitext tag v$version
+brew create https://github.com/tungdev1209/homebrew-ios-ci/archive/v$version.tar.gz

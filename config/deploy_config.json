@@ -1,5 +1,6 @@
 {
     "project_path":".",
+    "project_name":"ProjectName.xcodeproj",
     "build_path":"./Build",
     "build_scheme":"BuildSchemeName",
     "archive_path":"./Archive",

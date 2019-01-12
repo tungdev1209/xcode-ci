@@ -1,44 +1,78 @@
 # created by TungNQ
 
-project_dir="$1"
-product_des_input="$2"
-args="$3"
+project_file_path="$1"
 
-# for framework
-project_type="$4"
-build_universal="$5"
-build_device="$6"
-build_simulator="$7"
+# global vars
+deploy_config_path="$(pwd)/.ci/deploy_config.json"
+process_path="$(pwd)/.ci/process.json"
+helper_path=$(dirname "$0")
+process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path}"
+
+project_dir=$(jq ".project_path" ${deploy_config_path} | tr -d \")
+product_des_input=$(jq ".build_path" ${deploy_config_path} | tr -d \")
 
 # setup for echo
 b=$(tput bold)
 n=$(tput sgr0)
 
-# global vars
-process_path="$(pwd)/.ci/process.json"
-deploy_config_path="$(pwd)/.ci/deploy_config.json"
-helper_path=$(dirname "$0")
-process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path} "
-
-if [ "$1" == "" ]; then
+if [ "${project_dir}" == "" ]; then
     echo "ERROR: Must have project directory"
     exit 1
 fi
-if [ "$2" == "" ]; then
+if [ "${product_des_input}" == "" ]; then
     product_des_input=${project_dir}
 fi
 
 project_dir="$(pwd)/${project_dir}"
 product_des_input="$(pwd)/${product_des_input}"
+product_des=${product_des_input}
 
-project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
-if [[ ${project_full_name} == *".xcodeproj" ]]; then
-    project_name=$(basename ${project_full_name} ".xcodeproj")
-else
-    project_name=$(basename ${project_full_name} ".xcworkspace")
+if [ ! -d "${product_des}" ]; then
+    mkdir ${product_des}
 fi
 
-product_des=${product_des_input}
+build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
+echo "=> Building... ${build_scheme}"
+xcodebuild_cmd="xcodebuild"
+
+project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
+if [[ ${project_file_path} == *".xcodeproj" ]]; then
+    project_name=$(basename ${project_full_name} ".xcodeproj")
+    default_args=";-project ${project_file_path}"
+else
+    project_name=$(basename ${project_full_name} ".xcworkspace")
+    default_args=";-workspace ${project_file_path}"
+fi
+
+config_args=$(jq ".build_args" ${deploy_config_path} | tr -d \")
+cmd_input_args=$(${process_value_cmd} -k build/args)
+default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build"
+build_args="${default_args}  ${config_args} ${cmd_input_args}"
+build_args=$(echo "$build_args" | tr ' ' ';')
+
+# add test?
+is_test=$(${process_value_cmd} -k test/run)
+if [ "${is_test}" == "1" ]; then
+    # get all test args
+    default_test_args=""
+    config_test_args=$(jq ".test_args" ${deploy_config_path} | tr -d \")
+    cmd_input_test_args=$(${process_value_cmd} -k test/args)
+    test_args="${default_test_args} ${config_test_args} ${cmd_input_test_args}"
+    test_args=$(echo ";test;$test_args" | tr ' ' ';')
+    build_args+=test_args
+fi
+
+echo "=> Building... ${build_scheme}"
+is_framework=$(${process_value_cmd} -k framework/run)
+if [ "${is_framework}" == "0" ]; then # build non-fw project
+    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
+    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
+    echo "execute >> ${b}${build_cmd}${n}"
+    ${build_cmd}
+    exit 1
+fi
+
+# prepare for building framework
 simulator_dir=${product_des}/Simulator
 device_dir=${product_des}/Device
 universal_dir=${product_des}/Universal
@@ -49,46 +83,22 @@ rm -rf ${simulator_dir}
 rm -rf ${device_dir}
 rm -rf ${universal_dir}
 
-if [ ! -d "${product_des}" ]; then
-    mkdir ${product_des}
-fi
-
-build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
-xcodebuild_cmd="xcodebuild"
-full_args=";-scheme;${build_scheme};-sdk;iphonesimulator;-configuration;Debug;ONLY_ACTIVE_ARCH=NO;build;${args}"
-
-# add test?
-is_test=$(${process_value_cmd} -k test/run)
-if [ "${is_test}" == "1" ]; then
-    # get all test args
-    default_args=""
-    config_args=$(jq ".test_args" ${deploy_config_path} | tr -d \")
-    cmd_input_args=$(${process_value_cmd} -k archive/args)
-    full_test_args="${default_args} ${config_args} ${cmd_input_args}"
-    full_test_args=$(echo ";test;$full_test_args" | tr ' ' ';')
-    full_args+=full_test_args
-fi
-
-if [ "${project_type}" != "-fw" ]; then # build non-fw project
-    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
-    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
-    echo "execute >> ${b}${build_cmd}${n}"
-    ${build_cmd}
-    exit 1
-fi
+build_universal=$(${process_value_cmd} -k framework/universal)
+build_simulator=$(${process_value_cmd} -k framework/simulator)
+build_device=$(${process_value_cmd} -k framework/device)
 
 if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     mkdir ${simulator_dir}
-    full_args+=";-sdk;iphonesimulator"
-    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
+    build_args+=";-sdk;iphonesimulator"
+    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
     ${build_cmd}
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
-    full_args+=";-sdk;iphoneos"
-    args=$(python ${helper_path}/py_merge_args.py -a ${full_args})
+    build_args+=";-sdk;iphoneos"
+    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
     echo "execute build device framework >> ${b}${build_cmd}${n}"
     ${build_cmd}
