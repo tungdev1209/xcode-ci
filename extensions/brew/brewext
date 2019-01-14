@@ -8,3 +8,10 @@ if [ "$1" == "release" ]; then
     rm -rf $brew_file_path
     gitext push "release $version"
 fi
+if [ "$1" == "reinstall" ]; then
+    brew_formula="$2"
+    brew uninstall --force $brew_formula
+    brew install $brew_formula
+    chmod +x /usr/local/opt/$brew_formula/bin/$brew_formula
+    brew audit --new-formula $brew_formula
+fi
