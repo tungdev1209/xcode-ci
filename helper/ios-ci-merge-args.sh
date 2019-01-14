@@ -11,7 +11,6 @@ for var in "$@"
 do
     arg_num=$(( arg_num + 1 ))
     if (( arg_num > 1 )); then # already keep $1
-        echo $var
         if [ "$start_value" == "1" ]; then
             if [ "${var: -1}" == "\\" ]; then # convert var to beauty string
                 var="${var:0:$((${#var}-1))}'"
