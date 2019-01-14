@@ -22,7 +22,7 @@ $ cd /Users/tungdev1209/Projects/iOS/HelloWorld
 $ ios-ci init
 ```
 ## Adjust default value
-After initialized, .deploy dir is created automatically, then you have to adjust params in both deploy_config.json and export_config.plist (ignore this file if you just want to archive)
+After initialized, .ci dir is created automatically, then you have to adjust params in both deploy_config.json and export_config.plist (ignore this file if you don't want to export)
 
 => ./.ci/deploy_config.json
 ```
