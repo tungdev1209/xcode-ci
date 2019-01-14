@@ -31,41 +31,39 @@ if [ ! -d "${product_des}" ]; then
     mkdir ${product_des}
 fi
 
-build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
-echo "=> Building... ${build_scheme}"
 xcodebuild_cmd="xcodebuild"
+merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
 
 project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
 if [[ ${project_file_path} == *".xcodeproj" ]]; then
     project_name=$(basename ${project_full_name} ".xcodeproj")
-    default_args=";-project ${project_file_path}"
+    default_args="-project ${project_file_path}"
 else
     project_name=$(basename ${project_full_name} ".xcworkspace")
-    default_args=";-workspace ${project_file_path}"
+    default_args="-workspace ${project_file_path}"
 fi
 
+build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
 config_args=$(jq ".build_args" ${deploy_config_path} | tr -d \")
 cmd_input_args=$(${process_value_cmd} -k build/args)
 default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build"
-build_args="${default_args}  ${config_args} ${cmd_input_args}"
-build_args=$(echo "$build_args" | tr ' ' ';')
+build_args="${default_args} ${config_args} ${cmd_input_args}"
 
 # add test?
 is_test=$(${process_value_cmd} -k test/run)
 if [ "${is_test}" == "1" ]; then
     # get all test args
-    default_test_args=""
+    default_test_args="test"
     config_test_args=$(jq ".test_args" ${deploy_config_path} | tr -d \")
     cmd_input_test_args=$(${process_value_cmd} -k test/args)
     test_args="${default_test_args} ${config_test_args} ${cmd_input_test_args}"
-    test_args=$(echo ";test;$test_args" | tr ' ' ';')
-    build_args+=test_args
+    build_args+=" $test_args"
 fi
 
 echo "=> Building... ${build_scheme}"
 is_framework=$(${process_value_cmd} -k framework/run)
 if [ "${is_framework}" == "0" ]; then # build non-fw project
-    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
+    args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
     echo "execute >> ${b}${build_cmd}${n}"
     ${build_cmd}
@@ -89,16 +87,16 @@ build_device=$(${process_value_cmd} -k framework/device)
 
 if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     mkdir ${simulator_dir}
-    build_args+=";-sdk;iphonesimulator"
-    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
+    build_args+=" -sdk iphonesimulator"
+    args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
     ${build_cmd}
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
-    build_args+=";-sdk;iphoneos"
-    args=$(python ${helper_path}/py_merge_args.py -a ${build_args})
+    build_args+=" -sdk iphoneos"
+    args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
     echo "execute build device framework >> ${b}${build_cmd}${n}"
     ${build_cmd}

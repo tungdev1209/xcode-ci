@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.15"
+version="1.0.16"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
