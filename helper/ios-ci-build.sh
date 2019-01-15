@@ -43,14 +43,21 @@ else
     default_args="-workspace ${project_file_path}"
 fi
 
+# make process cmd
+is_build=$(${process_value_cmd} -k build/run)
+is_test=$(${process_value_cmd} -k test/run)
+
 build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
 config_args=$(jq ".build_args" ${deploy_config_path} | tr -d \")
 cmd_input_args=$(${process_value_cmd} -k build/args)
-default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO build"
+default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO"
+
+if [ "${is_build}" == "1" ]; then
+    default_args+=" build"
+fi
+
 build_args="${default_args} ${config_args} ${cmd_input_args}"
 
-# add test?
-is_test=$(${process_value_cmd} -k test/run)
 if [ "${is_test}" == "1" ]; then
     # get all test args
     default_test_args="test"

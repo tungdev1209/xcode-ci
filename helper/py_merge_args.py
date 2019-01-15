@@ -12,6 +12,7 @@ args_string = args["arguments"]
 args_array = args_string.split(';')
 
 keys_values = {}
+process_keys = []
 is_new_key = False
 current_key = ''
 for arg in args_array:
@@ -45,7 +46,10 @@ for arg in args_array:
             a_value += '=' + v
         keys_values[a_key] = a_value
     elif arg != "":
-        keys_values[arg] = ''
+        if arg == 'clean' or arg == 'build' or arg == 'test' or arg == 'archive':
+            process_keys.append(arg)
+        else:
+            keys_values[arg] = ''
 
 full_args = ''
 for key in keys_values:
@@ -56,6 +60,17 @@ for key in keys_values:
     elif value != "":
         full_args += ' ' + value
     full_args += ' '
+
+if len(process_keys) > 0:
+    if 'clean' in process_keys:
+        full_args += ' clean'
+    if 'build' in process_keys:
+        full_args += ' build'
+    if 'test' in process_keys:
+        full_args += ' test'
+    if 'archive' in process_keys:
+        full_args += ' archive'
+        
 print full_args
 
         
