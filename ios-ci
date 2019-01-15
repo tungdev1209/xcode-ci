@@ -1,6 +1,6 @@
 # created by TungNQ
 
-version="1.0.19"
+version="1.0.20"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -14,7 +14,6 @@ fi
 
 # global vars
 resource_path="$(brew --cellar ios-ci)/$version"
-resource_path="/Users/tungnguyen/Desktop/Projects/Products/ios-ci-utils"
 helper_path="${resource_path}/helper"
 deploy_path="$(pwd)/.ci"
 hooks_path="${deploy_path}/hooks"
