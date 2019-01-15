@@ -13,16 +13,16 @@ args_array = args_string.split(';')
 
 keys_values = {}
 process_keys = []
+
 is_new_key = False
 current_key = ''
 for arg in args_array:
-    # print arg
     if is_new_key:
         if arg[0:1] == '-':
             keys_values[current_key] = ''
             is_new_key = True
             current_key = arg
-        else:    
+        else:
             keys_values[current_key] = arg
             is_new_key = False
             current_key = ''
@@ -51,15 +51,20 @@ for arg in args_array:
         else:
             keys_values[arg] = ''
 
+def applyKeyValues(kvs):
+    args=''
+    for key in kvs:
+        args += key
+        value = kvs[key]
+        if key[-1:] == '=':
+            args += value
+        elif value != "":
+            args += ' ' + value
+        args += ' '
+    return args
+
 full_args = ''
-for key in keys_values:
-    full_args += key
-    value = keys_values[key]
-    if key[-1:] == '=':
-        full_args += value
-    elif value != "":
-        full_args += ' ' + value
-    full_args += ' '
+full_args += applyKeyValues(keys_values)
 
 if len(process_keys) > 0:
     if 'clean' in process_keys:
@@ -70,7 +75,7 @@ if len(process_keys) > 0:
         full_args += ' test'
     if 'archive' in process_keys:
         full_args += ' archive'
-        
+
 print full_args
 
         

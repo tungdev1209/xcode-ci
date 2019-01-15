@@ -34,4 +34,4 @@ archive_args=$(${merge_args_cmd} ${archive_args})
 echo "=> Archiving... ${archive_scheme}.xcarchive"
 archive_cmd="xcodebuild ${archive_args}"
 echo "execute >> ${b}${archive_cmd}${n}"
-${archive_cmd}
+eval "${archive_cmd}"

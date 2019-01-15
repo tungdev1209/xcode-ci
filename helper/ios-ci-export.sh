@@ -25,4 +25,4 @@ export_args=$(${merge_args_cmd} ${export_args})
 # get the export cmd
 export_cmd="xcodebuild ${export_args}"
 echo "execute >> ${b}${export_cmd}${n}"
-${export_cmd}
+eval "${export_cmd}"

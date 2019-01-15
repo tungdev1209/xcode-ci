@@ -73,7 +73,7 @@ if [ "${is_framework}" == "0" ]; then # build non-fw project
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
     echo "execute >> ${b}|${build_cmd}|${n}"
-    ${build_cmd}
+    eval "${build_cmd}"
     exit 1
 fi
 
@@ -98,7 +98,7 @@ if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
-    ${build_cmd}
+    eval "${build_cmd}"
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
@@ -106,7 +106,7 @@ if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
     echo "execute build device framework >> ${b}${build_cmd}${n}"
-    ${build_cmd}
+    eval "${build_cmd}"
 fi
 
 if [ "${build_universal}" == "0" ]; then

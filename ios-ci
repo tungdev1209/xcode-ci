@@ -14,6 +14,7 @@ fi
 
 # global vars
 resource_path="$(brew --cellar ios-ci)/$version"
+resource_path="/Users/tungnguyen/Desktop/Projects/Products/ios-ci-utils"
 helper_path="${resource_path}/helper"
 deploy_path="$(pwd)/.ci"
 hooks_path="${deploy_path}/hooks"
