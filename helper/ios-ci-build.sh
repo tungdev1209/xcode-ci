@@ -58,7 +58,7 @@ function get_extend_cmd() {
             continue
         fi
         if (( arg_num > 1 )); then
-            extend_cmd+="|$ext_cmd"
+            extend_cmd+="|$ext_cmd "
         else
             cmd_args=$ext_cmd
         fi
