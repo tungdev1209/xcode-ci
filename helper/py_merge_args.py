@@ -64,18 +64,17 @@ def applyKeyValues(kvs):
     return args
 
 full_args = ''
+full_args += applyKeyValues(keys_values)
 
 if len(process_keys) > 0:
     if 'clean' in process_keys:
-        full_args += 'clean '
+        full_args += ' clean'
     if 'build' in process_keys:
-        full_args += 'build '
+        full_args += ' build'
     if 'test' in process_keys:
-        full_args += 'test '
+        full_args += ' test'
     if 'archive' in process_keys:
-        full_args += 'archive '
-
-full_args += applyKeyValues(keys_values)
+        full_args += ' archive'
 
 print full_args
 

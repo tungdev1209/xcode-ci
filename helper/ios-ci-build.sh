@@ -43,13 +43,44 @@ else
     default_args="-workspace ${project_file_path}"
 fi
 
+extend_cmd=''
+cmd_args=''
+declare -i arg_num=0
+function get_extend_cmd() {
+    if [[ $1 != *"|"* ]]; then
+        cmd_args="$1"
+        return
+    fi
+    IFS='|' read -ra cmds <<< "$1"
+    for ext_cmd in "${cmds[@]}"; do
+        arg_num=$(( arg_num + 1 ))
+        if [ "$ext_cmd" == "" ]; then
+            continue
+        fi
+        if (( arg_num > 1 )); then
+            extend_cmd+="|$ext_cmd"
+        else
+            cmd_args=$ext_cmd
+        fi
+    done
+}
+
 # make process cmd
 is_build=$(${process_value_cmd} -k build/run)
 is_test=$(${process_value_cmd} -k test/run)
 
 build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
+
+# get config args
 config_args=$(jq ".build_args" ${deploy_config_path} | tr -d \")
+get_extend_cmd "$config_args"
+config_args=$cmd_args
+
+# get input args
 cmd_input_args=$(${process_value_cmd} -k build/args)
+get_extend_cmd "$cmd_input_args"
+cmd_input_args=$cmd_args
+
 default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO"
 
 if [ "${is_build}" == "1" ]; then
@@ -61,8 +92,17 @@ build_args="${default_args} ${config_args} ${cmd_input_args}"
 if [ "${is_test}" == "1" ]; then
     # get all test args
     default_test_args="test"
+
+    # get config args
     config_test_args=$(jq ".test_args" ${deploy_config_path} | tr -d \")
+    get_extend_cmd "$config_test_args"
+    config_test_args=$cmd_args
+
+    # get input args
     cmd_input_test_args=$(${process_value_cmd} -k test/args)
+    get_extend_cmd "$cmd_input_test_args"
+    cmd_input_test_args=$cmd_args
+
     test_args="${default_test_args} ${config_test_args} ${cmd_input_test_args}"
     build_args+=" $test_args"
 fi
@@ -72,6 +112,9 @@ is_framework=$(${process_value_cmd} -k framework/run)
 if [ "${is_framework}" == "0" ]; then # build non-fw project
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
+    if [ "$extend_cmd" != "" ]; then
+        build_cmd+=" ${extend_cmd}"
+    fi
     echo "execute >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
     exit 1
@@ -97,6 +140,9 @@ if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     build_args+=" -sdk iphonesimulator"
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
+    if [ "$extend_cmd" != "" ]; then
+        build_cmd+=" ${extend_cmd}"
+    fi
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
 fi
@@ -105,6 +151,9 @@ if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     build_args+=" -sdk iphoneos"
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
+    if [ "$extend_cmd" != "" ]; then
+        build_cmd+=" ${extend_cmd}"
+    fi
     echo "execute build device framework >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
 fi
