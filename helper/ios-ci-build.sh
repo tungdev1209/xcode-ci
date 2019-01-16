@@ -72,7 +72,7 @@ is_framework=$(${process_value_cmd} -k framework/run)
 if [ "${is_framework}" == "0" ]; then # build non-fw project
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
-    echo "execute >> ${b}|${build_cmd}|${n}"
+    echo "execute >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
     exit 1
 fi

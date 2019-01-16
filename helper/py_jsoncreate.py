@@ -67,7 +67,6 @@ for value in arr_values:
             if process == 'b':
                 json_content['build']['run'] = '1'
             if process == 't':
-                json_content['build']['run'] = '1'
                 json_content['test']['run'] = '1'
             elif process == 'a':
                 json_content['archive']['run'] = '1'
