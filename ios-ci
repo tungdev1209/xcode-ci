@@ -105,15 +105,25 @@ if [ "${is_build}" == "1" ] || [ "${is_test}" == "1" ]; then
         mkdir ${build_path}
     fi
 
-    # Run Pre Build job
-    sh ${hooks_path}/pre_build.sh ${deploy_config_path} ${build_path}
+    # Run Pre Build/Test job
+    if [ "${is_build}" == "1" ]; then
+        sh ${hooks_path}/pre_build.sh ${deploy_config_path} ${build_path}
+    fi
+    if [ "${is_test}" == "1" ]; then
+        sh ${hooks_path}/pre_test.sh ${deploy_config_path} ${build_path}
+    fi
 
-    # Run Build job
+    # Run Build/Test job
     build_cmd="sh ${helper_path}/ios-ci-build.sh ${project_file_path}"
     ${build_cmd}
 
-    # Run Post Build job
-    sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path}
+    # Run Post Build/Test job
+    if [ "${is_build}" == "1" ]; then
+        sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path}
+    fi
+    if [ "${is_test}" == "1" ]; then
+        sh ${hooks_path}/post_test.sh ${deploy_config_path} ${build_path}
+    fi
 fi
 
 archive_scheme=$(jq ".archive_scheme" ${deploy_config_path} | tr -d \")
