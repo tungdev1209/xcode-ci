@@ -15,12 +15,17 @@ helper_path=$(dirname "$0")
 process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path}"
 merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
 
+remain_value=''
 extend_cmd=''
 cmd_args=''
 declare -i arg_num=0
 function get_extend_cmd() {
+    if [ "$1" == "" ]; then
+        return
+    fi
     if [[ $1 != *"|"* ]]; then
-        cmd_args="$1"
+        get_result_path "$1"
+        cmd_args="$remain_value"
         return
     fi
     IFS='|' read -ra cmds <<< "$1"
@@ -30,11 +35,41 @@ function get_extend_cmd() {
             continue
         fi
         if (( arg_num > 1 )); then
-            extend_cmd+="|$ext_cmd "
+            get_result_path "$ext_cmd"
+            extend_cmd+="|$remain_value "
         else
             cmd_args=$ext_cmd
         fi
     done
+    arg_num=0
+}
+
+result_path=''
+declare -i result_path_loop_num=0
+function get_result_path() {
+    if [ "$1" == "" ]; then
+        return
+    fi
+    # get result path if it exists
+    result_path=''
+    remain_value=''
+    if [[ $1 != *">"* ]]; then
+        remain_value="$1"
+        return
+    fi
+    IFS='>' read -ra result_paths <<< "$1"
+    for r_path in "${result_paths[@]}"; do
+        result_path_loop_num=$(( result_path_loop_num + 1 ))
+        if [ "$r_path" == "" ]; then
+            continue
+        fi
+        if (( result_path_loop_num > 1 )); then # have result path
+            result_path=$r_path
+        else
+            remain_value=$r_path
+        fi
+    done
+    result_path_loop_num=0
 }
 
 # get all export args
@@ -57,6 +92,9 @@ export_args=$(${merge_args_cmd} ${export_args})
 export_cmd="xcodebuild ${export_args}"
 if [ "$extend_cmd" != "" ]; then
     export_cmd+=" ${extend_cmd}"
+fi
+if [ "$result_path" != "" ]; then
+    export_cmd+=" >${result_path}"
 fi
 echo "execute >> ${b}${export_cmd}${n}"
 eval "${export_cmd}"
