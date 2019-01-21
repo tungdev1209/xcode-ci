@@ -20,7 +20,6 @@ for arg in args_array:
     if is_new_key:
         if arg[0:1] == '-':
             keys_values[current_key] = ''
-            is_new_key = True
             current_key = arg
         else:
             keys_values[current_key] = arg
@@ -50,6 +49,9 @@ for arg in args_array:
             process_keys.append(arg)
         else:
             keys_values[arg] = ''
+
+if current_key != "":
+    keys_values[current_key] = ''
 
 def applyKeyValues(kvs):
     args=''

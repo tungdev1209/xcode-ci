@@ -92,6 +92,13 @@ function get_result_path() {
 is_build=$(${process_value_cmd} -k build/run)
 is_test=$(${process_value_cmd} -k test/run)
 
+if [ "${is_test}" == "1" ]; then
+    test_dir="$product_des/Test"
+    if [ ! -d "$test_dir" ]; then
+        mkdir $test_dir
+    fi
+fi
+
 xcodebuild_cmd="xcodebuild"
 merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
 
@@ -146,7 +153,7 @@ echo "=> Building... ${build_scheme}"
 is_framework=$(${process_value_cmd} -k framework/run)
 if [ "${is_framework}" == "0" ]; then # build non-fw project
     args=$(${merge_args_cmd} ${build_args})
-    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${product_des} ${args}"
+    build_cmd="${xcodebuild_cmd} ${args}"
     if [ "$extend_cmd" != "" ]; then
         build_cmd+=" ${extend_cmd}"
     fi
@@ -155,6 +162,26 @@ if [ "${is_framework}" == "0" ]; then # build non-fw project
     fi
     echo "execute >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
+
+    build_args+=" -showBuildSettings"
+    args=$(${merge_args_cmd} ${build_args})
+    build_cmd="${xcodebuild_cmd} ${args}"
+    eval "${build_cmd} | grep -w 'BUILD_DIR' > .ci/build_dirs.log"
+
+    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
+    derived_test_dir="$derived_build_dir/../ProfileData"
+    echo $derived_build_dir
+
+    if [ "${is_build}" == "1" ]; then
+        cp -R $derived_build_dir/ $product_des/
+    fi
+
+    if [ "${is_test}" == "1" ]; then
+        cp -R $derived_test_dir/ $test_dir/
+    fi
+
+    rm -rf .ci/build_dirs.log
+
     exit 1
 fi
 
