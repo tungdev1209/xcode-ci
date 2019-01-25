@@ -14,7 +14,7 @@ fi
 
 # global vars
 resource_path="$(brew --cellar ios-ci)/$version"
-# resource_path=$(dirname "$0")
+resource_path=$(dirname "$0")
 helper_path="${resource_path}/helper"
 deploy_path="$(pwd)/.ci"
 hooks_path="${deploy_path}/hooks"
@@ -118,12 +118,16 @@ if [ "${is_build}" == "1" ] || [ "${is_test}" == "1" ]; then
     build_cmd="sh ${helper_path}/ios-ci-build.sh ${project_file_path}"
     ${build_cmd}
 
+    # Get derived data path
+    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
+    rm -rf .ci/build_dirs.log
+
     # Run Post Build/Test job
     if [ "${is_build}" == "1" ]; then
-        sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path}
+        sh ${hooks_path}/post_build.sh ${deploy_config_path} ${build_path} ${derived_build_dir}
     fi
     if [ "${is_test}" == "1" ]; then
-        sh ${hooks_path}/post_test.sh ${deploy_config_path} ${build_path}
+        sh ${hooks_path}/post_test.sh ${deploy_config_path} ${build_path} ${derived_build_dir}
     fi
 fi
 

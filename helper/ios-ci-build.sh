@@ -112,8 +112,8 @@ else
 fi
 
 build_scheme=$(jq ".build_scheme" ${deploy_config_path} | tr -d \")
+setting_args="${default_args} -scheme ${build_scheme} -showBuildSettings"
 default_args+=" -scheme ${build_scheme} -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO"
-
 build_args="$default_args"
 
 if [ "${is_build}" == "1" ]; then
@@ -149,6 +149,15 @@ if [ "${is_test}" == "1" ]; then
     build_args+=" ${default_test_args} ${config_test_args} ${cmd_input_test_args}"
 fi
 
+derived_build_dir=''
+derived_test_dir=''
+function export_derived_data_path() {
+    eval "${xcodebuild_cmd} ${setting_args} | grep -w 'BUILD_DIR' > .ci/build_dirs.log"
+
+    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
+    derived_test_dir="$derived_build_dir/../ProfileData"
+}
+
 echo "=> Building... ${build_scheme}"
 is_framework=$(${process_value_cmd} -k framework/run)
 if [ "${is_framework}" == "0" ]; then # build non-fw project
@@ -163,14 +172,7 @@ if [ "${is_framework}" == "0" ]; then # build non-fw project
     echo "execute >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
 
-    build_args+=" -showBuildSettings"
-    args=$(${merge_args_cmd} ${build_args})
-    build_cmd="${xcodebuild_cmd} ${args}"
-    eval "${build_cmd} | grep -w 'BUILD_DIR' > .ci/build_dirs.log"
-
-    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
-    derived_test_dir="$derived_build_dir/../ProfileData"
-    echo $derived_build_dir
+    export_derived_data_path
 
     if [ "${is_build}" == "1" ]; then
         cp -R $derived_build_dir/ $product_des/
@@ -179,8 +181,6 @@ if [ "${is_framework}" == "0" ]; then # build non-fw project
     if [ "${is_test}" == "1" ]; then
         cp -R $derived_test_dir/ $test_dir/
     fi
-
-    rm -rf .ci/build_dirs.log
 
     exit 1
 fi
@@ -213,6 +213,8 @@ if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     fi
     echo "execute build simulator framework >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
+
+    export_derived_data_path
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
@@ -227,6 +229,8 @@ if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     fi
     echo "execute build device framework >> ${b}${build_cmd}${n}"
     eval "${build_cmd}"
+
+    export_derived_data_path
 fi
 
 if [ "${build_universal}" == "0" ]; then

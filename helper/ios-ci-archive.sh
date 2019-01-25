@@ -80,6 +80,9 @@ else
     default_args="-workspace ${project_file_path}"
 fi
 
+# remove current archive file
+rm -rf ${archive_file_path}/${archive_scheme}.xcarchive
+
 # get all archive args
 default_args+=" -scheme ${archive_scheme} -archivePath ${archive_file_path} -configuration Release archive"
 
