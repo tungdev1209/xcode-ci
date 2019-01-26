@@ -104,10 +104,8 @@ merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
 
 project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
 if [[ ${project_file_path} == *".xcodeproj" ]]; then
-    project_name=$(basename ${project_full_name} ".xcodeproj")
     default_args="-project ${project_file_path}"
 else
-    project_name=$(basename ${project_full_name} ".xcworkspace")
     default_args="-workspace ${project_file_path}"
 fi
 
@@ -152,15 +150,17 @@ fi
 derived_build_dir=''
 derived_test_dir=''
 function export_derived_data_path() {
-    eval "${xcodebuild_cmd} ${setting_args} | grep -w 'BUILD_DIR' > .ci/build_dirs.log"
+    settings_cmd="${xcodebuild_cmd} ${args} -showBuildSettings | grep -w 'TARGET_BUILD_DIR' > .ci/build_dirs.log"
+    # echo "execute settings cmd >>> $settings_cmd"
+    eval $settings_cmd
 
-    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
-    derived_test_dir="$derived_build_dir/../ProfileData"
+    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k TARGET_BUILD_DIR)
+    derived_test_dir="$derived_build_dir/../../ProfileData"
 }
 
 echo "=> Building... ${build_scheme}"
 is_framework=$(${process_value_cmd} -k framework/run)
-if [ "${is_framework}" == "0" ]; then # build non-fw project
+if [ "${is_framework}" == "0" ]; then # build normal project
     args=$(${merge_args_cmd} ${build_args})
     build_cmd="${xcodebuild_cmd} ${args}"
     if [ "$extend_cmd" != "" ]; then
@@ -174,12 +174,16 @@ if [ "${is_framework}" == "0" ]; then # build non-fw project
 
     export_derived_data_path
 
-    if [ "${is_build}" == "1" ]; then
-        cp -R $derived_build_dir/ $product_des/
-    fi
+    if [ "$derived_build_dir" != "" ]; then
+        if [ "${is_build}" == "1" ]; then
+            cp_cmd="cp -R $derived_build_dir/${build_scheme}.app $product_des/"
+            eval $cp_cmd
+        fi
 
-    if [ "${is_test}" == "1" ]; then
-        cp -R $derived_test_dir/ $test_dir/
+        if [ "${is_test}" == "1" ]; then
+            cp_cmd="cp -R $derived_test_dir/ $test_dir/"
+            eval $cp_cmd
+        fi
     fi
 
     exit 1
@@ -189,8 +193,8 @@ fi
 simulator_dir=${product_des}/Simulator
 device_dir=${product_des}/Device
 universal_dir=${product_des}/Universal
-project_binary="${project_name}.framework/${project_name}"
-project_dSYM_binary="${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}"
+project_binary="${build_scheme}.framework/${build_scheme}"
+project_dSYM_binary="${build_scheme}.framework.dSYM/Contents/Resources/DWARF/${build_scheme}"
 
 rm -rf ${simulator_dir}
 rm -rf ${device_dir}
@@ -204,7 +208,7 @@ if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     mkdir ${simulator_dir}
     build_args+=" -sdk iphonesimulator"
     args=$(${merge_args_cmd} ${build_args})
-    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${simulator_dir} ${args}"
+    build_cmd="${xcodebuild_cmd} ${args}"
     if [ "$extend_cmd" != "" ]; then
         build_cmd+=" ${extend_cmd}"
     fi
@@ -215,12 +219,17 @@ if [ "${build_universal}" == "1" ] || [ "${build_simulator}" == "1" ]; then
     eval "${build_cmd}"
 
     export_derived_data_path
+
+    if [ "$derived_build_dir" != "" ]; then
+        cp_cmd="cp -R ${derived_build_dir}/${build_scheme}.framework/ ${simulator_dir}/${build_scheme}.framework/"
+        eval $cp_cmd
+    fi
 fi
 if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     mkdir ${device_dir}
     build_args+=" -sdk iphoneos"
     args=$(${merge_args_cmd} ${build_args})
-    build_cmd="${xcodebuild_cmd} CONFIGURATION_BUILD_DIR=${device_dir} ${args}"
+    build_cmd="${xcodebuild_cmd} ${args}"
     if [ "$extend_cmd" != "" ]; then
         build_cmd+=" ${extend_cmd}"
     fi
@@ -231,6 +240,11 @@ if [ "${build_universal}" == "1" ] || [ "${build_device}" == "1" ]; then
     eval "${build_cmd}"
 
     export_derived_data_path
+
+    if [ "$derived_build_dir" != "" ]; then
+        cp_cmd="cp -R ${derived_build_dir}/${build_scheme}.framework/ ${device_dir}/${build_scheme}.framework/"
+        eval $cp_cmd
+    fi
 fi
 
 if [ "${build_universal}" == "0" ]; then
@@ -238,21 +252,21 @@ if [ "${build_universal}" == "0" ]; then
 fi
 
 mkdir ${universal_dir}
-mkdir ${universal_dir}/${project_name}.framework
+mkdir ${universal_dir}/${build_scheme}.framework
 
 echo "=== combine dSYM files ==="
-cp -R ${device_dir}/${project_name}.framework.dSYM ${universal_dir}
-rm -rf ${universal_dir}/${project_name}.framework.dSYM/Contents/Resources/DWARF/${project_name}
+cp -R ${device_dir}/${build_scheme}.framework.dSYM ${universal_dir}
+rm -rf ${universal_dir}/${build_scheme}.framework.dSYM/Contents/Resources/DWARF/${build_scheme}
 lipo "${simulator_dir}/${project_dSYM_binary}" "${device_dir}/${project_dSYM_binary}" -create -output "${universal_dir}/${project_dSYM_binary}"
 
-UUIDs=$(dwarfdump --uuid "${device_dir}/${project_name}.framework.dSYM" | cut -d ' ' -f2)
+UUIDs=$(dwarfdump --uuid "${device_dir}/${build_scheme}.framework.dSYM" | cut -d ' ' -f2)
 echo ${UUIDs}
 for file in `find "${device_dir}" -name "*.bcsymbolmap" -type f`; do
     file_name=$(basename "$file" ".bcsymbolmap")
     for UUID in $UUIDs; do
         if [[ "$UUID" = "$file_name" ]]; then
             cp -R "$file" "$universal_dir"
-            dsymutil --symbol-map ${universal_dir}/${file_name}.bcsymbolmap ${universal_dir}/${project_name}.framework.dSYM
+            dsymutil --symbol-map ${universal_dir}/${file_name}.bcsymbolmap ${universal_dir}/${build_scheme}.framework.dSYM
         fi
     done
 done
@@ -260,8 +274,8 @@ done
 echo "=== combine Project binary files ==="
 lipo "${simulator_dir}/${project_binary}" "${device_dir}/${project_binary}" -create -output "${universal_dir}/${project_binary}"
 
-rsync -av ${device_dir}/${project_name}.framework/ ${universal_dir}/${project_name}.framework/ --exclude ${project_name}
-cp -R ${simulator_dir}/${project_name}.framework/Modules/${project_name}.swiftmodule/. ${universal_dir}/${project_name}.framework/Modules/${project_name}.swiftmodule
+rsync -av ${device_dir}/${build_scheme}.framework/ ${universal_dir}/${build_scheme}.framework/ --exclude ${build_scheme}
+cp -R ${simulator_dir}/${build_scheme}.framework/Modules/${build_scheme}.swiftmodule/. ${universal_dir}/${build_scheme}.framework/Modules/${build_scheme}.swiftmodule
 
 if [ "${build_simulator}" == "0" ]; then
     rm -rf ${simulator_dir}
