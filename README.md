@@ -1,7 +1,7 @@
 # ios-ci
 
 ## Description
-Build, Archive, Export,... iOS/MacOS app via command line.   
+Build, Test, Archive, Export,... iOS/MacOS app via command line.   
 
 ## Requirements
 xcodebuild
