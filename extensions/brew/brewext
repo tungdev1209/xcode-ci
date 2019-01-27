@@ -2,11 +2,16 @@
 if [ "$1" == "release" ]; then
     version="$2"
     gitext tag v$version
-    brew create https://github.com/tungdev1209/homebrew-ios-ci/archive/v$version.tar.gz
+    brew create https://github.com/tungdev1209/ios-ci/archive/v$version.tar.gz
     brew_file_path="/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/homebrew-ios-ci.rb"
-    copyshavalue -ps $brew_file_path -pd ./ios-ci.rb
+    copyshavalue -ps $brew_file_path -pd ./../homebrew-ios-ci/ios-ci.rb
     rm -rf $brew_file_path
+    chmod +x ios-ci
+    current_apth=$(pwd)
     gitext push "release $version"
+    cd ./../homebrew-ios-ci
+    gitext push "release $version"
+    cd $current_apth
 fi
 if [ "$1" == "reinstall" ]; then
     brew_formula="$2"
