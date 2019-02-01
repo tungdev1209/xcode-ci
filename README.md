@@ -1,25 +1,25 @@
-# ios-ci
+# xcode-ci
 
 ## Description
-Build, Test, Archive, Export,... iOS/MacOS app via command line.   
+CI iOS/MacOS app via command line.   
 
 ## Requirements
 xcodebuild
 
 ## Install
 ```sh
-$ brew tap tungdev1209/ios-ci
-$ brew install ios-ci
+$ brew tap tungdev1209/xcode-ci
+$ brew install xcode-ci
 ```
 ## Initialize
 ```sh
 $ cd path/to/ios/project
-$ ios-ci init
+$ xcode-ci init
 ```
 Ex:
 ```sh
 $ cd /Users/tungdev1209/Projects/iOS/HelloWorld
-$ ios-ci init
+$ xcode-ci init
 ```
 ## Adjust default value
 After initialized, .ci dir is created automatically, then you have to adjust params in both deploy_config.json and export_config.plist (ignore this file if you don't want to export)
@@ -70,7 +70,7 @@ After initialized, .ci dir is created automatically, then you have to adjust par
 ## Command
 Syntax: 
 ```sh
-$ ios-ci <command>
+$ xcode-ci <command>
 ```
 * ```init [-f/--force]``` : Initialize ci components (```-f``` force re-init)
 * ```-b/--build 'build args'``` : Additional Build command arguments (plus build_args value in deploy_config.json in order to make final Build command)
@@ -93,7 +93,7 @@ You could override above args via deploy_config.json and **ios-ci** command
 
 ## Hooks
 ```sh
-$ ios-ci
+$ xcode-ci
 ```
 Above command means: **ios-ci** will run all of the processes one by one (Build -> Test -> Archive -> Export) with config files (deploy_config.json and export_config.plist). Before and after each process, **ios-ci** allow you add more processes you would like to run via ./hooks file
 * pre_build.sh
@@ -110,11 +110,11 @@ Above command means: **ios-ci** will run all of the processes one by one (Build 
 
 => For normal project:
 ```sh
-$ ios-ci -r 'b'
+$ xcode-ci -r 'b'
 ```
 => For framework project:
 ```sh
-$ ios-ci -fw 'u.d' -r 'a.e'
+$ xcode-ci -fw 'u.d' -r 'a.e'
 ```
 
 ## License
