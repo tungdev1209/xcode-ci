@@ -8,7 +8,7 @@ xcodebuild
 
 ## Install
 ```sh
-$ brew tap tungdev1209/xcode-ci
+$ brew tap tungse1209/xcode-ci
 $ brew install xcode-ci
 ```
 ## Initialize
@@ -18,7 +18,7 @@ $ xcode-ci init
 ```
 Ex:
 ```sh
-$ cd /Users/tungdev1209/Projects/iOS/HelloWorld
+$ cd /Users/tungse1209/Projects/iOS/HelloWorld
 $ xcode-ci init
 ```
 ## Adjust default value
@@ -52,7 +52,7 @@ After initialized, .ci dir is created automatically, then you have to adjust par
 	<string>enterprise</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.tungdev1209.helloworld</key>
+		<key>com.tungse1209.helloworld</key>
 		<string>70f47xxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</string>
 	</dict>
 	<key>signingCertificate</key>
