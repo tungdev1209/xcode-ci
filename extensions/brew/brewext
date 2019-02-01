@@ -1,15 +1,16 @@
-# sh
+#!/usr/bin/env bash
+
 if [ "$1" == "release" ]; then
     version="$2"
     gitext tag v$version
-    brew create https://github.com/tungdev1209/ios-ci/archive/v$version.tar.gz
-    brew_file_path="/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/ios-ci.rb"
-    copyshavalue -ps $brew_file_path -pd ./../homebrew-ios-ci/ios-ci.rb
+    brew create https://github.com/tungse1209/xcode-ci/archive/v$version.tar.gz
+    brew_file_path="/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/xcode-ci.rb"
+    copyshavalue -ps $brew_file_path -pd ./../homebrew-xcode-ci/xcode-ci.rb
     rm -rf $brew_file_path
-    chmod +x ios-ci
+    chmod +x xcode-ci
     current_path=$(pwd)
     gitext push "release $version"
-    cd ./../homebrew-ios-ci
+    cd ./../homebrew-xcode-ci
     gitext push "release $version"
     cd $current_path
 fi
