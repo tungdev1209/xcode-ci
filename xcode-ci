@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.4"
+version="1.1.5"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -32,14 +32,14 @@ n=$(tput sgr0)
 if [ "$1" == "init" ]; then
     # get resource
     if [ ! -d "${resource_path}" ]; then
-        echo "=> Resource not found, please 'brew reinstall ios-ci'"
+        echo "=> Resource not found, please 'brew reinstall xcode-ci'"
         exit 1
     fi
 
     deploy_path="./.ci"
     if [ -d "${deploy_path}" ]; then
         if [ "$2" != "-f" ] && [ "$2" != "--force" ]; then
-            echo "=> This project is initialized, please 'ios-ci init -f' to re-init"
+            echo "=> This project is initialized, please 'xcode-ci init -f' to re-init"
             exit 1
         fi
     fi
@@ -62,7 +62,7 @@ fi
 # check this project is initialized?
 if [ ! -e "${deploy_config_path}" ]; then
     echo "=> ${deploy_config_name} not found at ${deploy_path}"
-    echo "=> Need initialize first: ios-ci init [-f]"
+    echo "=> Need initialize first: xcode-ci init [-f]"
     exit 1
 fi
 
@@ -168,13 +168,13 @@ if [ "${is_export}" == "1" ]; then
     # check this project is initialized?
     if [ ! -e "${export_config_path}" ]; then
         echo "=> ${export_config_name} not found at ${deploy_path}"
-        echo "=> Need initialize first: ios-ci init [-f]"
+        echo "=> Need initialize first: xcode-ci init [-f]"
         destroy
         exit 1
     fi
     if [ ! -e "${archive_file_path}" ]; then
         echo "=> ${archive_scheme}.xcarchive not found"
-        echo "=> Need archive first: ios-ci -r 'a'"
+        echo "=> Need archive first: xcode-ci -r 'a'"
         destroy
         exit 1
     fi
