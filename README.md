@@ -52,7 +52,7 @@ After initialized, .ci dir is created automatically, then you have to adjust par
 	<string>enterprise</string>
 	<key>provisioningProfiles</key>
 	<dict>
-		<key>com.tungse1209.helloworld</key>
+		<key>com.tungdev1209.helloworld</key>
 		<string>70f47xxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</string>
 	</dict>
 	<key>signingCertificate</key>
