@@ -8,7 +8,7 @@ xcodebuild
 
 ## Install
 ```sh
-$ brew tap tungse1209/xcode-ci
+$ brew tap tungdev1209/xcode-ci
 $ brew install xcode-ci
 ```
 ## Initialize
@@ -18,7 +18,7 @@ $ xcode-ci init
 ```
 Ex:
 ```sh
-$ cd /Users/tungse1209/Projects/iOS/HelloWorld
+$ cd /Users/tungdev1209/Projects/iOS/HelloWorld
 $ xcode-ci init
 ```
 ## Adjust default value
