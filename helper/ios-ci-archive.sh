@@ -14,7 +14,7 @@ process_path="$(pwd)/.ci/process.json"
 helper_path=$(dirname "$0")
 process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path}"
 archive_file_path="${archive_path}/${archive_scheme}.xcarchive"
-merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
+merge_args_cmd="sh ${helper_path}/xcode-ci-merge-args.sh"
 
 remain_value=''
 extend_cmd=''

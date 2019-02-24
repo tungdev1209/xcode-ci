@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.6"
+version="1.1.7"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -14,7 +14,7 @@ if [ "$1" == "-v" ] || [ "$1" == "--version" ]; then
 fi
 
 # global vars
-resource_path="$(brew --cellar ios-ci)/$version"
+resource_path="$(brew --cellar xcode-ci)/$version"
 # resource_path=$(dirname "$0")
 helper_path="${resource_path}/helper"
 deploy_path="$(pwd)/.ci"
@@ -116,7 +116,7 @@ if [ "${is_build}" == "1" ] || [ "${is_test}" == "1" ]; then
     fi
 
     # Run Build/Test job
-    build_cmd="sh ${helper_path}/ios-ci-build.sh ${project_file_path}"
+    build_cmd="sh ${helper_path}/xcode-ci-build.sh ${project_file_path}"
     ${build_cmd}
 
     # Get derived data path
@@ -148,7 +148,7 @@ if [ "${is_archive}" == "1" ]; then
     sh ${hooks_path}/pre_archive.sh ${deploy_config_path} ${archive_path}
 
     # Run Archive job
-    archive_cmd="sh ${helper_path}/ios-ci-archive.sh ${project_file_path} ${archive_path} ${archive_scheme}"
+    archive_cmd="sh ${helper_path}/xcode-ci-archive.sh ${project_file_path} ${archive_path} ${archive_scheme}"
     ${archive_cmd}
 
     # check archive status: failed => exit
@@ -192,7 +192,7 @@ if [ "${is_export}" == "1" ]; then
 
     # Run Export job
     echo "=> Exporting... ${file_exported_name}"
-    export_cmd="sh ${helper_path}/ios-ci-export.sh ${export_path} ${archive_file_path}"
+    export_cmd="sh ${helper_path}/xcode-ci-export.sh ${export_path} ${archive_file_path}"
     ${export_cmd}
 
     # check export status: failed => exit

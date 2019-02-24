@@ -100,7 +100,7 @@ if [ "${is_test}" == "1" ]; then
 fi
 
 xcodebuild_cmd="xcodebuild"
-merge_args_cmd="sh ${helper_path}/ios-ci-merge-args.sh"
+merge_args_cmd="sh ${helper_path}/xcode-ci-merge-args.sh"
 
 project_full_name=$(jq ".project_name" ${deploy_config_path} | tr -d \")
 if [[ ${project_file_path} == *".xcodeproj" ]]; then
