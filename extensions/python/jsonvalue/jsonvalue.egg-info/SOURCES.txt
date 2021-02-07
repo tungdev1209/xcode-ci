@@ -1,6 +1,0 @@
-setup.py
-jsonvalue.egg-info/PKG-INFO
-jsonvalue.egg-info/SOURCES.txt
-jsonvalue.egg-info/dependency_links.txt
-jsonvalue.egg-info/entry_points.txt
-jsonvalue.egg-info/top_level.txt
