@@ -49,8 +49,8 @@ for line in f_des:
             if c == '"':
                 start_value = True
         # replace sha value
-        print "current >> " + old_sha_value
-        print "new >> " + sha_value
+        print(f'current >> {old_sha_value}')
+        print(f'new >> {sha_value}')
         line = line.replace(old_sha_value, sha_value)
     content += line
 
