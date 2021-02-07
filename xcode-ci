@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.9"
+version="1.1.20"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -179,9 +179,6 @@ if [ "${is_export}" == "1" ]; then
         exit 1
     fi
 
-    # prepare vars for exporting steps
-    file_exported_name="${archive_scheme}.ipa"
-
     # create export path
     export_id=$(uuidgen)
     export_path="${archive_path}/Export_${export_id}"
@@ -191,18 +188,19 @@ if [ "${is_export}" == "1" ]; then
     sh ${hooks_path}/pre_export.sh ${deploy_config_path} ${export_path}
 
     # Run Export job
-    echo "=> Exporting... ${file_exported_name}"
+    echo "=> Exporting... ${archive_scheme}"
     export_cmd="sh ${helper_path}/xcode-ci-export.sh ${export_path} ${archive_file_path}"
     ${export_cmd}
 
     # check export status: failed => exit
-    if [ ! -e "${export_path}/${file_exported_name}" ]; then
+    $ipa_file_name=$(find . -type f -name "*.ipa" -print | head -n 1)
+    if [ "$ipa_file_name" == "" ]; then
         destroy
         exit 1
     fi
 
     # Run Post Export job
-    sh ${hooks_path}/post_export.sh ${deploy_config_path} ${export_path} ${file_exported_name}
+    sh ${hooks_path}/post_export.sh ${deploy_config_path} ${export_path} ${ipa_file_name}
 fi
 
 destroy
