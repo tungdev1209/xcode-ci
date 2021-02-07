@@ -1,7 +1,7 @@
 ext_path=$(dirname "$0")
-pip install -e ${ext_path}/python/jsonvalue
-pip install -e ${ext_path}/python/qrgen
-pip install -e ${ext_path}/python/copyshavalue
+pip3 install -e ${ext_path}/python/jsonvalue
+pip3 install -e ${ext_path}/python/qrgen
+pip3 install -e ${ext_path}/python/copyshavalue
 chmod +x $ext_path/git/gitext
 chmod +x $ext_path/brew/brewext
 cp $ext_path/git/gitext /usr/local/bin

@@ -1,0 +1,6 @@
+setup.py
+copyshavalue.egg-info/PKG-INFO
+copyshavalue.egg-info/SOURCES.txt
+copyshavalue.egg-info/dependency_links.txt
+copyshavalue.egg-info/entry_points.txt
+copyshavalue.egg-info/top_level.txt
