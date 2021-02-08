@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.10"
+version="1.1.11"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -193,7 +193,7 @@ if [ "${is_export}" == "1" ]; then
     ${export_cmd}
 
     # check export status: failed => exit
-    $ipa_file_name=$(find . -type f -name "*.ipa" -print | head -n 1)
+    ipa_file_name=$(find . -type f -name "*.ipa" -print | head -n 1 | cut -d'/' -f 2)
     if [ "$ipa_file_name" == "" ]; then
         destroy
         exit 1
