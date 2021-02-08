@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.12"
+version="1.1.13"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -193,14 +193,16 @@ if [ "${is_export}" == "1" ]; then
     ${export_cmd}
 
     # check export status: failed => exit
-    ipa_file_name=$(find . -type f -name "*.ipa" -print | head -n 1 | cut -d'/' -f 2 | cut -d'.' -f 1)
+    # echo "Export path is: $export_path"
+    ipa_file_name=$(find $export_path -type f -name "*.ipa" -print | head -n 1 | rev | cut -d'/' -f 1 | rev)
     if [ "$ipa_file_name" == "" ]; then
         destroy
         exit 1
     fi
 
     # Run Post Export job
-    sh ${hooks_path}/post_export.sh ${deploy_config_path} ${export_path} ${ipa_file_name}
+    # echo "Exported file is: $ipa_file_name"
+    sh ${hooks_path}/post_export.sh ${deploy_config_path} ${export_path} "${ipa_file_name}"
 fi
 
 destroy
