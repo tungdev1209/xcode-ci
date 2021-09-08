@@ -26,4 +26,4 @@ qr.make(fit=True)
 
 def run():
     img = qr.make_image(fill_color="black", back_color="white")
-    img.save(name + '.png')
+    img.save(f'{name}.png')

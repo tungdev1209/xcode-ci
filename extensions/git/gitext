@@ -1,11 +1,52 @@
-# sh
+#!/bin/sh
+
 if [ "$1" == "push" ] && [ "$2" != "" ]; then
     git add .
     git commit -m "$2"
     git push
     git status
+    exit;
 fi
 if [ "$1" == "tag" ] && [ "$2" != "" ]; then
     git tag $2
     git push origin $2
+    exit;
 fi
+if [ "$1" != "release" ] || [ "$2" == "" ]; then
+    echo 'branch name is empty -> nothing to do'
+    exit;
+fi
+validate_release()
+{
+    while true; do
+        read -p "$1" yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit;;
+            * ) echo "Please answer y (yes) or n (no)";;
+        esac
+    done
+}
+
+validate_release 'Did write down release notes? (y/n)'
+validate_release 'Did increase target version? (y/n)'
+
+branch_name=$2
+current_branch_name=$(git branch --show-current)
+
+git checkout $branch_name
+git pull $branch_name
+
+echo '>> Merge to develop'
+git checkout develop
+git pull
+git merge $branch_name
+git push
+
+echo '>> Merge to staging'
+git checkout staging
+git pull
+git merge develop
+git push
+
+git checkout $current_branch_name

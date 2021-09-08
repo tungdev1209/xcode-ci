@@ -27,4 +27,4 @@ for line in f:
         if word == '=':
             start_value = True
     break
-print value
+print(value)

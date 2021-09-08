@@ -30,6 +30,6 @@ for key in keys:
 f.close()
 
 if isinstance(current_data, list):
-    print ', '.join(current_data)
+    print(f', {current_data}')
 else:
-    print current_data
+    print(current_data)
