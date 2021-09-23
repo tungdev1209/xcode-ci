@@ -78,6 +78,6 @@ if len(process_keys) > 0:
     if 'archive' in process_keys:
         full_args += ' archive'
 
-print full_args
+print(full_args)
 
         

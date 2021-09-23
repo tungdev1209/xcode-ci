@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.14"
+version="1.1.15"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
