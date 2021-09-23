@@ -3,7 +3,7 @@
 if [ "$1" == "release" ]; then
     version="$2"
     gitext tag v$version
-    brew create https://github.com/tungse1209/xcode-ci/archive/v$version.tar.gz
+    brew create https://github.com/tungdev1209/xcode-ci/archive/v$version.tar.gz
     brew_file_path="/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula/xcode-ci.rb"
     copyshavalue -ps $brew_file_path -pd ./../homebrew-xcode-ci/xcode-ci.rb
     rm -rf $brew_file_path
