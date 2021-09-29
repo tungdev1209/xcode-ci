@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # created by TungNQ
 
-version="1.1.15"
+version="1.1.16"
 
 if [ "$1" == "__test_cmd" ]; then
     echo "ok"
@@ -81,8 +81,8 @@ done
 # define processes
 process_path="${deploy_path}/process.json"
 touch ${process_path}
-python ${helper_path}/py_jsoncreate.py -v "${ci_cmd_args}" -p ${process_path}
-process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path} "
+python3 ${helper_path}/py_jsoncreate.py -v "${ci_cmd_args}" -p ${process_path}
+process_value_cmd="python3 ${helper_path}/py_jsonvalue.py -p ${process_path} "
 
 destroy()
 {
@@ -120,7 +120,7 @@ if [ "${is_build}" == "1" ] || [ "${is_test}" == "1" ]; then
     ${build_cmd}
 
     # Get derived data path
-    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
+    derived_build_dir=$(python3 ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k BUILD_DIR)
     rm -rf .ci/build_dirs.log
 
     # Run Post Build/Test job

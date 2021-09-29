@@ -12,7 +12,7 @@ deploy_config_path="$(pwd)/.ci/deploy_config.json"
 export_config_path="$(pwd)/.ci/export_config.plist"
 process_path="$(pwd)/.ci/process.json"
 helper_path=$(dirname "$0")
-process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path}"
+process_value_cmd="python3 ${helper_path}/py_jsonvalue.py -p ${process_path}"
 merge_args_cmd="sh ${helper_path}/xcode-ci-merge-args.sh"
 
 remain_value=''

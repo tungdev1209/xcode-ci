@@ -6,7 +6,7 @@ project_file_path="$1"
 deploy_config_path="$(pwd)/.ci/deploy_config.json"
 process_path="$(pwd)/.ci/process.json"
 helper_path=$(dirname "$0")
-process_value_cmd="python ${helper_path}/py_jsonvalue.py -p ${process_path}"
+process_value_cmd="python3 ${helper_path}/py_jsonvalue.py -p ${process_path}"
 
 project_dir=$(jq ".project_path" ${deploy_config_path} | tr -d \")
 product_des_input=$(jq ".build_path" ${deploy_config_path} | tr -d \")
@@ -154,7 +154,7 @@ function export_derived_data_path() {
     # echo "execute settings cmd >>> $settings_cmd"
     eval $settings_cmd
 
-    derived_build_dir=$(python ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k TARGET_BUILD_DIR)
+    derived_build_dir=$(python3 ${helper_path}/py_file_get_value.py -p .ci/build_dirs.log -k TARGET_BUILD_DIR)
     derived_test_dir="$derived_build_dir/../../ProfileData"
 }
 

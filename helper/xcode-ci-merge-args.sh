@@ -112,5 +112,5 @@ do
         ci_cmd_args+=";${var}"
     fi
 done
-args=$(python ${helper_path}/py_merge_args.py -a "${ci_cmd_args}")
+args=$(python3 ${helper_path}/py_merge_args.py -a "${ci_cmd_args}")
 echo $args
